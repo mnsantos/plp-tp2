@@ -5,7 +5,10 @@
 %% Ejercicio 1
 %% tablero(+Filas,+Columnas,-Tablero) instancia una estructura de tablero en blanco
 %% de Filas x Columnas, con todas las celdas libres.
-tablero(_,_,_).
+
+tablero(0,_,[]).
+tablero(_,0,[]).
+tablero(F,C,T) :- F>0, F1 is F-1, length(L,C), append(T,L,RES), tablero(F1, C, T), T=RES.
 
 
 %% Ejercicio 2
