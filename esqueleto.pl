@@ -5,7 +5,6 @@
 %% Ejercicio 1
 %% tablero(+Filas,+Columnas,-Tablero) instancia una estructura de tablero en blanco
 %% de Filas x Columnas, con todas las celdas libres.
-
 tablero(1,C,T) :- length(COLS,C), T=[COLS].
 tablero(F,C,T) :- F>1, C>0, F2 is F-1, length(COLS,C), tablero(F2,C,T2), T=[COLS|T2].
 
@@ -41,7 +40,9 @@ vecinoLibre(pos(F,C),T,pos(F2,C2)) :- vecino(pos(F,C),T,pos(F2,C2)), nth0(F2,T,F
 %% Notar que la cantidad de caminos es finita y por ende se tiene que poder recorrer
 %% todas las alternativas eventualmente.
 %% Consejo: Utilizar una lista auxiliar con las posiciones visitadas
-camino(_,_,_,_).
+camino(PI,PF,T,C) :- caminoAux(PI,PF,T,C,[]).
+caminoAux(P,P,_,C,_) :- C=[P].
+caminoAux(PI,PF,T,C,CAUX) :- PI \== PF, vecinoLibre(PI,T,PL), not(member(PL,CAUX)), append([PI],CAUX,CAUX2), caminoAux(PL,PF,T,CAM,CAUX2), C=[PI|CAM].
 
 %% Ejercicio 6
 %% cantidadDeCaminos(+Inicio, +Fin, +Tablero, ?N) que indique la cantidad de caminos
