@@ -40,15 +40,13 @@ vecinoLibre(pos(F,C),T,pos(F2,C2)) :- vecino(pos(F,C),T,pos(F2,C2)), nth0(F2,T,F
 %% Notar que la cantidad de caminos es finita y por ende se tiene que poder recorrer
 %% todas las alternativas eventualmente.
 %% Consejo: Utilizar una lista auxiliar con las posiciones visitadas
-camino(PI,PF,T,C) :- caminoAux(PI,PF,T,C,[]).
-caminoAux(P,P,_,C,_) :- C=[P].
-caminoAux(PI,PF,T,C,CAUX) :- PI \== PF, vecinoLibre(PI,T,PL), not(member(PL,CAUX)), append([PI],CAUX,CAUX2), caminoAux(PL,PF,T,CAM,CAUX2), C=[PI|CAM].
+camino(P,P,_,[P]).
+camino(INI,FIN,T,CAM) :- INI\==FIN, ocupar(INI,T), vecinoLibre(INI,T,VECINO), camino(VECINO,FIN,T,CAM2), CAM=[INI|CAM2].
 
 %% Ejercicio 6
 %% cantidadDeCaminos(+Inicio, +Fin, +Tablero, ?N) que indique la cantidad de caminos
 %% posibles sin ciclos entre Inicio y Fin.
-cantidadDeCaminos(INI,FIN,T,N) :- aggregate_all(count, camino(INI,FIN,T,_), N).
-
+cantidadDeCaminos(INI,FIN,T,N) :- aggregate_all(count, camino(INI,FIN,T,_), N). 
 
 %% Ejercicio 7
 %% camino2(+Inicio, +Fin, +Tablero, -Camino) ídem camino/4 pero se espera una heurística
