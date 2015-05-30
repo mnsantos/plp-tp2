@@ -6,9 +6,11 @@
 %% tablero(+Filas,+Columnas,-Tablero) instancia una estructura de tablero en blanco
 %% de Filas x Columnas, con todas las celdas libres.
 
+corte(L,L1,L2) :- append(L1,L2,L).
+
 tablero(0,_,[]).
 tablero(_,0,[]).
-tablero(F,C,T) :- F>0, F1 is F-1, length(L,C), append(T,L,RES), tablero(F1, C, T), T=RES.
+tablero(F,C,T) :- F>0, F1 is F-1, length(L,C), append(T,L,RES), tablero(F1, C, RES).
 
 
 %% Ejercicio 2
