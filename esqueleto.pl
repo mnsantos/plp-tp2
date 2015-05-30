@@ -25,7 +25,7 @@ vecino(pos(F,C),T,pos(F,OESTE)) :-  OESTE is C-1, nth0(F,T,FIL), nth0(OESTE,FIL,
 %% Ejercicio 4
 %% vecinoLibre(+Pos, +Tablero, -PosVecino) idem vecino/3 pero además PosVecino
 %% debe ser una celda transitable (no ocupada) en el Tablero
-vecinoLibre(pos(F,C),T,pos(F2,C2)) :- vecino(pos(F,C),T,pos(F2,C2)), nth0(F2,T,FIL), nth0(C2,FIL,CEL), CEL\==ocupada.
+vecinoLibre(P,T,pos(F,C)) :- vecino(P,T,pos(F,C)), nth0(F,T,FIL), nth0(C,FIL,CEL), CEL\==ocupada.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%
