@@ -47,7 +47,8 @@ caminoAux(PI,PF,T,C,CAUX) :- PI \== PF, vecinoLibre(PI,T,PL), not(member(PL,CAUX
 %% Ejercicio 6
 %% cantidadDeCaminos(+Inicio, +Fin, +Tablero, ?N) que indique la cantidad de caminos
 %% posibles sin ciclos entre Inicio y Fin.
-cantidadDeCaminos(_,_,_,_).
+cantidadDeCaminos(INI,FIN,T,N) :- aggregate_all(count, camino(INI,FIN,T,_), N).
+
 
 %% Ejercicio 7
 %% camino2(+Inicio, +Fin, +Tablero, -Camino) ídem camino/4 pero se espera una heurística
