@@ -46,7 +46,9 @@ camino(INI,FIN,T,CAM) :- INI\==FIN, ocupar(INI,T), vecinoLibre(INI,T,VECINO), ca
 %% Ejercicio 6
 %% cantidadDeCaminos(+Inicio, +Fin, +Tablero, ?N) que indique la cantidad de caminos
 %% posibles sin ciclos entre Inicio y Fin.
-cantidadDeCaminos(INI,FIN,T,N) :- aggregate_all(count, camino(INI,FIN,T,_), N). 
+cantidadDeCaminos(INI,FIN,T,N) :- aggregate_all(count,camino(INI,FIN,T,_),N). 
+cantidadDeCaminos2(INI,FIN,T,N) :- aggregate_all(count,camino2(INI,FIN,T,_),N). 
+cantidadDeCaminos3(INI,FIN,T,N) :- aggregate_all(count,camino3(INI,FIN,T,_),N).
 
 %% Ejercicio 7
 %% camino2(+Inicio, +Fin, +Tablero, -Camino) ídem camino/4 pero se espera una heurística
@@ -55,11 +57,13 @@ cantidadDeCaminos(INI,FIN,T,N) :- aggregate_all(count, camino(INI,FIN,T,_), N).
 %% Una solución es mejor mientras menos pasos se deba dar para llegar a
 %% destino (distancia Manhattan). Por lo tanto, el predicado deberá devolver de a uno,
 %% todos los caminos pero en orden creciente de longitud.
-distancia(pos(F1,C1), pos(F2,C2), D) :- abs(F1-F2,DIFF1), abs(C1-C2,DIFF2), D is DIFF1+DIFF2.   
-hayPosLibreMasCercana(PI,PL,PF,T) :- vecinoLibre(PI,T,POS), distancia(PL,PF,D1), distancia(POS,PF,D2), D1>D2. 
-camino2(PI,PF,T,C) :- caminoAux(PI,PF,T,C,[]).
-caminoAux2(P,P,_,C,_) :- C=[P].
-caminoAux2(PI,PF,T,C,CAUX) :- PI \== PF, vecinoLibre(PI,T,PL), not(member(PL,CAUX)), not(hayPosLibreMasCercana(PI,PL,PF,T)), append([PI],CAUX,CAUX2), caminoAux2(PL,PF,T,CAM,CAUX2), C=[PI|CAM].
+camino2(P,P,_,[P]).
+camino2(INI,FIN,T,CAM) :- INI\==FIN, ocupar(INI,T), mejorVecinoLibre(INI,FIN,T,VECINO), camino2(VECINO,FIN,T,CAM2), CAM=[INI|CAM2].
+
+distancia(pos(F1,C1), pos(F2,C2), D) :- abs(F1-F2,DIFF1), abs(C1-C2,DIFF2), D is DIFF1+DIFF2. 
+  
+mejorVecinoLibre(POS,FIN,T,VL) :- findall(V,vecinoLibre(POS,T,V),LISTAVL), map_list_to_pairs(distancia(FIN),LISTAVL,PARESVL), 
+                                  keysort(PARESVL,ORDENVL), pairs_values(ORDENVL,VECINOS), member(VL,VECINOS).
 
 %% Ejercicio 8
 %% camino3(+Inicio, +Fin, +Tablero, -Camino) ídem camino2/4 pero se espera que
