@@ -74,7 +74,20 @@ mejorVecinoLibre(POS,FIN,T,VL) :- findall(V,vecinoLibre(POS,T,V),LISTAVL), map_l
 %% desde Inicio en más de 6 pasos.
 %% Notar que dos ejecuciones de camino3/4 con los mismos argumentos deben dar los mismos resultados.
 %% En este ejercicio se permiten el uso de predicados: dynamic/1, asserta/1, assertz/1 y retractall/1.
-camino3(_,_,_,_).
+camino3(INI,FIN,T,CAM) :- retractall(caminoMinimo(_)), retractall(posInicial(_)), assert(posInicial(INI)), cam3(INI,FIN,T,CAM).
+
+cam3(P,P,_,[P]).
+cam3(INI,FIN,T,CAM) :- INI\==FIN, ocupar(INI,T), mejorVecinoLibre(INI,FIN,T,VECINO), cam3(VECINO,FIN,T,CAM2), CAM=[INI|CAM2], length(CAM,LEN), actualizaCamMin(INI,LEN).
+
+actualizaCamMin(P,_) :- not(caminoMinimo(_)), not(posInicial(P)),!.
+actualizaCamMin(P,L) :- not(caminoMinimo(_)), posInicial(P), assert(caminoMinimo(L)),!.
+actualizaCamMin(P,L) :- caminoMinimo(LEN), not(posInicial(P)), LEN=<L, fail.
+actualizaCamMin(P,L) :- caminoMinimo(LEN), not(posInicial(P)), LEN>L.
+actualizaCamMin(P,L) :- caminoMinimo(LEN), posInicial(P), LEN<L, fail.
+actualizaCamMin(P,L) :- caminoMinimo(LEN), posInicial(P), LEN>=L, retract(caminoMinimo(LEN)), assert(caminoMinimo(L)).
+
+:- dynamic posInicial/1.
+:- dynamic caminoMinimo/1.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%
