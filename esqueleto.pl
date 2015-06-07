@@ -99,7 +99,7 @@ actualizaCamMin(P,L) :- caminoMinimo(LEN), posInicial(P), LEN>=L, retract(camino
 %% cuando Camino sea un camino desde Inicio hasta Fin pasando al mismo tiempo
 %% sólo por celdas transitables de ambos tableros.
 %% Nota: Es posible una implementación que resuelva en forma inmediata casos en los que trivialmente no existe camino dual posible.
-caminoDual(_,_,_,_,_).
+caminoDual(INI,FIN,T1,T2,CAM) :- camino2(INI,FIN,T1,CAMT1), camino2(INI,FIN,T2,CAMT2), CAMT1 == CAMT2, CAM = CAMT1.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -114,3 +114,6 @@ tablero(ej2,T) :- tablero(3,3,T), ocupar(pos(1,1),T).
 
 %% Figura 1 de 5x5
 tablero(ej5x5,T) :- tablero(5,5,T), ocupar(pos(1,1),T), ocupar(pos(1,2),T).
+
+%% Tablero 5x5 vacio
+tablero(ej5x5vacio,T) :- tablero(5,5,T).
