@@ -49,6 +49,7 @@ camino(INI,FIN,T,CAM) :- INI\==FIN, ocupar(INI,T), vecinoLibre(INI,T,VECINO), ca
 cantidadDeCaminos(INI,FIN,T,N) :- aggregate_all(count,camino(INI,FIN,T,_),N). 
 cantidadDeCaminos2(INI,FIN,T,N) :- aggregate_all(count,camino2(INI,FIN,T,_),N). 
 cantidadDeCaminos3(INI,FIN,T,N) :- aggregate_all(count,camino3(INI,FIN,T,_),N).
+cantidadDeCaminoDual(INI,FIN,T1,T2,N) :- aggregate_all(count,caminoDual(INI,FIN,T1,T2,_),N).
 
 %% Ejercicio 7
 %% camino2(+Inicio, +Fin, +Tablero, -Camino) ídem camino/4 pero se espera una heurística
@@ -101,7 +102,10 @@ actualizaCamMin(P,L) :- not(caminoMinimo(_)), posInicial(P), assert(caminoMinimo
 %% cuando Camino sea un camino desde Inicio hasta Fin pasando al mismo tiempo
 %% sólo por celdas transitables de ambos tableros.
 %% Nota: Es posible una implementación que resuelva en forma inmediata casos en los que trivialmente no existe camino dual posible.
-caminoDual(INI,FIN,T1,T2,CAM) :- camino2(INI,FIN,T1,CAMT1), camino2(INI,FIN,T2,CAMT2), CAMT1 == CAMT2, CAM = CAMT1.
+caminoDual(P,P,_,_,[P]).
+caminoDual(INI,FIN,T1,T2,CAM) :- INI\==FIN, ocupar(INI,T1), mejorVecinoLibre(INI,FIN,T1,VECINO), posLibre(VECINO,T2),caminoDual(VECINO,FIN,T1,T2,CAM2), CAM=[INI|CAM2].
+
+posLibre(pos(F,C),T) :- nth0(F,T,FIL), nth0(C,FIL,CEL), CEL\==ocupada.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -116,6 +120,9 @@ tablero(ej2,T) :- tablero(3,3,T), ocupar(pos(1,1),T).
 
 %% Figura 1 de 5x5
 tablero(ej5x5,T) :- tablero(5,5,T), ocupar(pos(1,1),T), ocupar(pos(1,2),T).
+
+%% Figura 1 de 5x5 con un ocupado mas
+tablero(ej5x5b,T) :- tablero(5,5,T), ocupar(pos(1,1),T), ocupar(pos(1,2),T), ocupar(pos(1,3),T).
 
 %% Tablero 5x5 vacio
 tablero(ej5x5vacio,T) :- tablero(5,5,T).
