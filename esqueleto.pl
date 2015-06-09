@@ -104,6 +104,15 @@ vecinoLibre(P,T,pos(F,C)) :- vecino(P,T,pos(F,C)), nth0(F,T,FIL), nth0(C,FIL,CEL
 camino(P,P,_,[P]).
 camino(INI,FIN,T,CAM) :- INI\==FIN, ocupar(INI,T), vecinoLibre(INI,T,VECINO), camino(VECINO,FIN,T,CAM2), CAM=[INI|CAM2].
 %%%%%%%%%%%%%%%%%%%%%%%%
+%% Detalle
+%%%%%%%%%%%%%%%%%%%%%%%%
+%% Como precondicion las posiciones de inicio y final no deben estar ocupadas.
+%% El camino se construye de forma recursiva. Partiendo de la posicion inicial, se sigue por algun
+%% vecino libre y se actualiza la posicion inicial para el proximo paso recursivo. 
+%% Finalizando el camino solo si la posicion inicial conincide con la final. Para evitar ciclos,
+%% en cada paso se va ocupando la celda utilizada de tal forma que no pueda utilizarse nuevamente.
+%% De esta forma y gracias al backtraking se prueban todos los caminos posibles.
+%%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% ?- tablero(3,3,T), ocupar(pos(0,1),T), camino(pos(0,0),pos(0,2),T,C).
@@ -112,12 +121,6 @@ camino(INI,FIN,T,CAM) :- INI\==FIN, ocupar(INI,T), vecinoLibre(INI,T,VECINO), ca
 %% C = [pos(0, 0), pos(1, 0), pos(1, 1), pos(2, 1), pos(2, 2), pos(1, 2), pos(0, 2)] ;
 %% C = [pos(0, 0), pos(1, 0), pos(1, 1), pos(1, 2), pos(0, 2)] ;
 %% false.
-%%%%%%%%%%%%%%%%%%%%%%%%
-%% Detalle
-%%%%%%%%%%%%%%%%%%%%%%%%
-%% Todo -camino- parte de la precondicion de que la posicion inicial no esta ocupada. Luego determina
-%% caminos posibles a traves del tablero hasta llegar a la posicion final.
-%% -camino- construye una lista de posiciones pasando por vecinos libres, los cuales ocupa momentaneamente.
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Ejercicio 6
