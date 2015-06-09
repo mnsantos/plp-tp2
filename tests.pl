@@ -24,17 +24,14 @@ test(vecinoLibre) :- tableroTest(tableroTest1,T), findall(V,vecinoLibre(pos(0,1)
 
 %% Tests camino
 %% Verifica que la cantidad de caminos de camino sea correcta.
-test(camino) :- tableroTest(tableroTest2,T), cantidadDeCaminos(pos(0,0),pos(0,0),T,N), N is 0, !.
 test(camino) :- tableroTest(tableroTest1,T), cantidadDeCaminos(pos(0,0),pos(2,3),T,N), N is 287, !.
 
 %% Tests camino2
 %% Verifica que la cantidad de caminos de camino2 sea correcta.
-test(camino2) :- tableroTest(tableroTest2,T), cantidadDeCaminos2(pos(0,0),pos(0,0),T,N), N is 0, !.
 test(camino2) :- tableroTest(tableroTest1,T), cantidadDeCaminos2(pos(0,0), pos(2,3),T,N), N is 287, !.
 
 %% Tests camino3
 %% Verifica que camino3 no devuelva soluciones peores a las ya encontradas.
-test(camino3) :- tableroTest(tableroTest2,T), cantidadDeCaminos3(pos(0,0),pos(0,0),T,N), N is 0, !.
 test(camino3) :- tableroTest(tableroTest1,T), camino3(pos(0,0),pos(2,3),T,C), length(C,L), not(L>6), !.
 
 %% Tests caminoDual
