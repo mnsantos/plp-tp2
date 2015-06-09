@@ -74,6 +74,11 @@ vecino(pos(F,C),T,pos(F,OESTE)) :-  OESTE is C-1, nth0(F,T,FIL), nth0(OESTE,FIL,
 %% debe ser una celda transitable (no ocupada) en el Tablero
 vecinoLibre(P,T,pos(F,C)) :- vecino(P,T,pos(F,C)), nth0(F,T,FIL), nth0(C,FIL,CEL), CEL\==ocupada.
 %%%%%%%%%%%%%%%%%%%%%%%%
+%% Detalle
+%%%%%%%%%%%%%%%%%%%%%%%%
+%% Para obtener los veciones libres aprovechamos el predicado anterior para obtener todos los
+%% candidatos y solo resta verificar que cada una de las posiciones no sea ´ocupada´ en el tablero.
+%%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% ?- tablero(3,3,T), ocupar(pos(0,1),T), vecinoLibre(pos(1,1),T,V).
@@ -82,11 +87,7 @@ vecinoLibre(P,T,pos(F,C)) :- vecino(P,T,pos(F,C)), nth0(F,T,FIL), nth0(C,FIL,CEL
 %% V = pos(1, 0) ;
 %% false.
 %%%%%%%%%%%%%%%%%%%%%%%%
-%% Detalle
-%%%%%%%%%%%%%%%%%%%%%%%%
-%% -vecinoLibre- es una adaptacion de vecino que determina que posiciones vecinas a una posicion 
-%% determinada estan libres.
-%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Definicion de caminos
