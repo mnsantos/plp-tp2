@@ -117,8 +117,10 @@ false.
 camino2(P,P,_,[P]).
 camino2(INI,FIN,T,CAM) :- INI\==FIN, ocupar(INI,T), mejorVecinoLibre(INI,FIN,T,VECINO), camino2(VECINO,FIN,T,CAM2), CAM=[INI|CAM2].
 
+%% distancia(+Pos1, +Pos2, -Distancia)
 distancia(pos(F1,C1), pos(F2,C2), D) :- abs(F1-F2,DIFF1), abs(C1-C2,DIFF2), D is DIFF1+DIFF2. 
   
+%% mejorVecinoLibre(+Pos, +PosFinCamino, +Tablero, -PosVecinoLibre)
 mejorVecinoLibre(POS,FIN,T,VL) :- findall(V,vecinoLibre(POS,T,V),LISTAVL), map_list_to_pairs(distancia(FIN),LISTAVL,PARESVL), 
                                   keysort(PARESVL,ORDENVL), pairs_values(ORDENVL,VECINOS), member(VL,VECINOS).
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -143,19 +145,25 @@ false.
 %% En este ejercicio se permiten el uso de predicados: dynamic/1, asserta/1, assertz/1 y retractall/1.
 camino3(INI,FIN,T,CAM) :- retractall(caminoMinimo(_)), retractall(posInicial(_)), assert(posInicial(INI)), cam3(INI,FIN,T,CAM,1).
 
+%% cam3(+Inicio, +Fin, +Tablero, -Camino, +LongitudCamino)
 cam3(P,P,_,[P],_).
 cam3(INI,FIN,T,CAM,L) :- INI\==FIN, evalRec(L), ocupar(INI,T), mejorVecinoLibre(INI,FIN,T,VECINO), L2 is L+1, cam3(VECINO,FIN,T,CAM2,L2), CAM=[INI|CAM2], length(CAM,LEN), actualizaCamMin(INI,LEN).
 
+%% evalRec(+LongitudCamino)
 evalRec(L) :- caminoMinimo(LEN), LEN=<L, fail.
 evalRec(L) :- caminoMinimo(LEN), LEN>L.
 evalRec(_) :- not(caminoMinimo(_)).
 
+%% actualizaCamMin(+PosInicioCamino, +LongitudCamino)
 actualizaCamMin(P,_) :- caminoMinimo(_), not(posInicial(P)).
 actualizaCamMin(P,L) :- caminoMinimo(LEN), posInicial(P), LEN>=L, retract(caminoMinimo(LEN)), assert(caminoMinimo(L)).
 actualizaCamMin(P,_) :- not(caminoMinimo(_)), not(posInicial(P)).
 actualizaCamMin(P,L) :- not(caminoMinimo(_)), posInicial(P), assert(caminoMinimo(L)).
 
+%% posInicial(?PosInicial)
 :- dynamic posInicial/1.
+
+%% caminoMinimo(?LongitudCamino)
 :- dynamic caminoMinimo/1.
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
