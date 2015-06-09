@@ -48,6 +48,13 @@ vecino(pos(F,C),T,pos(SUR,C)) :-  SUR is F+1, nth0(SUR,T,FIL), nth0(C,FIL,_).
 vecino(pos(F,C),T,pos(F,ESTE)) :-  ESTE is C+1, nth0(F,T,FIL), nth0(ESTE,FIL,_).
 vecino(pos(F,C),T,pos(F,OESTE)) :-  OESTE is C-1, nth0(F,T,FIL), nth0(OESTE,FIL,_).
 %%%%%%%%%%%%%%%%%%%%%%%%
+%% Detalle
+%%%%%%%%%%%%%%%%%%%%%%%%
+%% Como en el ejercicio anterior, se hace uso del predicado nth0 para elegir las 
+%% cuatro posibles celdas vecinas y unificarlas con el resultado.
+%% Se hace provecho que nth0 falla cuando los indices estan fuera del
+%% tamañno del tablero y por ello no devuelve posiciones fuera de el.
+%%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% ?- tablero(3,3,T), ocupar(pos(0,1),T), vecino(pos(0,0),T,V).
@@ -60,12 +67,6 @@ vecino(pos(F,C),T,pos(F,OESTE)) :-  OESTE is C-1, nth0(F,T,FIL), nth0(OESTE,FIL,
 %% V = pos(1, 2) ;
 %% V = pos(1, 0) ;
 %% false.
-%%%%%%%%%%%%%%%%%%%%%%%%
-%% Detalle
-%%%%%%%%%%%%%%%%%%%%%%%%
-%% Dados un tablero y una posicion, instancia PosVecino de forma tal que se encuentre
-%% arriba/abajo o a izquierda/derecha de la posicion parametro, de no estar dicha posicion en
-%% el borde del tablero. 
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Ejercicio 4
