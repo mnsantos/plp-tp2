@@ -25,17 +25,17 @@ tablero(F,C,T) :- F>1, C>0, F2 is F-1, length(COLS,C), tablero(F2,C,T2), T=[COLS
 %% ocupar(+Pos,?Tablero) será verdadero cuando la posición indicada esté ocupada.
 ocupar(pos(F,C),T) :- nth0(F,T,FILA), nth0(C,FILA,CELDA), CELDA=ocupada.
 %%%%%%%%%%%%%%%%%%%%%%%%
+%% Detalle
+%%%%%%%%%%%%%%%%%%%%%%%%
+%% Utilizando el predicado nth0, primero se elige la fila del tablero y luego de esta fila 
+%% se elige la columna indicada, obteniendoce la celda de la posicion. 
+%% Finalmente esta celda es unificada con ´ocupada´
+%%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% ?- tablero(3,3,T), ocupar(pos(0,1),T).
 %% T = [[_G529, ocupada, _G535], [_G538, _G541, _G544], [_G547, _G550, _G553]] ;
 %% false.
-%%%%%%%%%%%%%%%%%%%%%%%%
-%% Detalle
-%%%%%%%%%%%%%%%%%%%%%%%%
-%% -ocupar- toma una posicion instanciada y un tablero. Si el tablero se encuentra instanciado
-%% determina si esa posicion se corresponde con una celda ocupada o no. De otra forma recorre
-%% las filas y columnas de dicho tablero hasta la posicion correspondiente y la setea como ocupada.
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Ejercicio 3
