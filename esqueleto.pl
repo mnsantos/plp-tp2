@@ -164,6 +164,15 @@ distancia(pos(F1,C1), pos(F2,C2), D) :- abs(F1-F2,DIFF1), abs(C1-C2,DIFF2), D is
 %% mejorVecinoLibre(+Pos, +PosFinCamino, +Tablero, -PosVecinoLibre)
 mejorVecinoLibre(POS,FIN,T,VL) :- findall(V,vecinoLibre(POS,T,V),LISTAVL), map_list_to_pairs(distancia(FIN),LISTAVL,PARESVL), 
                                   keysort(PARESVL,ORDENVL), pairs_values(ORDENVL,VECINOS), member(VL,VECINOS).
+%%%%%%%%%%%%%%%%%%%%%%%% 
+%% Detalle
+%%%%%%%%%%%%%%%%%%%%%%%%
+%% Para realizar camino2 se tomo como base camino. Para lograr una mejora de la heuristica solo fue necesario  
+%% utilizar una version optimizada del predicado original vecinoLibre que fue reempazada por mejorVecinoLibre.
+%% Esta nueva version, devuelve los mismos vecinos que su predecesora solo que esta version los ordena  
+%% utilizando un criterio de distancia Manhattan. Priemero devuelve el veciono mas cercano a la posicion final. 
+%% De esta forma los primero caminos tienden a ser los mas cortos.
+%% Para esto se hace uso de un predicados auxiliare, 'distancia' que calcula la distancia Manhattan.
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
 %%%%%%%%%%%%%%%%%%%%%%%% 
@@ -173,13 +182,7 @@ mejorVecinoLibre(POS,FIN,T,VL) :- findall(V,vecinoLibre(POS,T,V),LISTAVL), map_l
 %% C = [pos(0, 0), pos(1, 0), pos(2, 0), pos(2, 1), pos(1, 1), pos(1, 2), pos(0, 2)] ;
 %% C = [pos(0, 0), pos(1, 0), pos(2, 0), pos(2, 1), pos(2, 2), pos(1, 2), pos(0, 2)] ;
 %% false.
-%%%%%%%%%%%%%%%%%%%%%%%%
-%% Detalle
-%%%%%%%%%%%%%%%%%%%%%%%%
-%% -camino2- optimiza -camino- reduciendo la distancia recorrida, tratando heuristicamente de no alejarse demasiado del punto final
-%% si no es necesario. Para ello utiliza el predicado mejorVecinoLibre, que toma dos posiciones instanciadas (la posicion actual y la final)
-%% y determina el vecino libre que mas se acerca a la posicion final, utilizado el predicado distancia.
-%%%%%%%%%%%%%%%%%%%%%%%%                                
+%%%%%%%%%%%%%%%%%%%%%%%%                               
 
 %% Ejercicio 8
 %% camino3(+Inicio, +Fin, +Tablero, -Camino) ídem camino2/4 pero se espera que
