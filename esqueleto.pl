@@ -76,7 +76,7 @@ vecinoLibre(P,T,pos(F,C)) :- vecino(P,T,pos(F,C)), nth0(F,T,FIL), nth0(C,FIL,CEL
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Detalle
 %%%%%%%%%%%%%%%%%%%%%%%%
-%% Para obtener los veciones libres aprovechamos el predicado anterior para obtener todos los
+%% Para obtener los vecinos libres aprovechamos el predicado anterior para obtener todos los
 %% candidatos y solo resta verificar que cada una de las posiciones no sea ´ocupada´ en el tablero.
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
