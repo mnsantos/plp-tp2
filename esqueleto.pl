@@ -10,9 +10,9 @@ tablero(F,C,T) :- F>1, C>0, F2 is F-1, length(COLS,C), tablero(F2,C,T2), T=[COLS
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
 %%%%%%%%%%%%%%%%%%%%%%%%
-?- tablero(3,3,T).
-T = [[_G4763, _G4766, _G4769], [_G4772, _G4775, _G4778], [_G4781, _G4784, _G4787]] ;
-false.
+%% ?- tablero(3,3,T).
+%% T = [[_G4763, _G4766, _G4769], [_G4772, _G4775, _G4778], [_G4781, _G4784, _G4787]] ;
+%% false.
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Ejercicio 2
@@ -21,9 +21,9 @@ ocupar(pos(F,C),T) :- nth0(F,T,FILA), nth0(C,FILA,CELDA), CELDA=ocupada.
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
 %%%%%%%%%%%%%%%%%%%%%%%%
-?- tablero(3,3,T), ocupar(pos(0,1),T).
-T = [[_G529, ocupada, _G535], [_G538, _G541, _G544], [_G547, _G550, _G553]] ;
-false.
+%% ?- tablero(3,3,T), ocupar(pos(0,1),T).
+%% T = [[_G529, ocupada, _G535], [_G538, _G541, _G544], [_G547, _G550, _G553]] ;
+%% false.
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Ejercicio 3
@@ -38,16 +38,16 @@ vecino(pos(F,C),T,pos(F,OESTE)) :-  OESTE is C-1, nth0(F,T,FIL), nth0(OESTE,FIL,
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
 %%%%%%%%%%%%%%%%%%%%%%%%
-?- tablero(3,3,T), ocupar(pos(0,1),T), vecino(pos(0,0),T,V).
-V = pos(1, 0) ;
-V = pos(0, 1) ;
-false.
-?- tablero(3,3,T), ocupar(pos(0,1),T), vecino(pos(1,1),T,V).
-V = pos(0, 1) ;
-V = pos(2, 1) ;
-V = pos(1, 2) ;
-V = pos(1, 0) ;
-false.
+%% ?- tablero(3,3,T), ocupar(pos(0,1),T), vecino(pos(0,0),T,V).
+%% V = pos(1, 0) ;
+%% V = pos(0, 1) ;
+%% false.
+%% ?- tablero(3,3,T), ocupar(pos(0,1),T), vecino(pos(1,1),T,V).
+%% V = pos(0, 1) ;
+%% V = pos(2, 1) ;
+%% V = pos(1, 2) ;
+%% V = pos(1, 0) ;
+%% false.
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Ejercicio 4
@@ -57,13 +57,12 @@ vecinoLibre(P,T,pos(F,C)) :- vecino(P,T,pos(F,C)), nth0(F,T,FIL), nth0(C,FIL,CEL
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
 %%%%%%%%%%%%%%%%%%%%%%%%
-?- tablero(3,3,T), ocupar(pos(0,1),T), vecinoLibre(pos(1,1),T,V).
-V = pos(2, 1) ;
-V = pos(1, 2) ;
-V = pos(1, 0) ;
-false.
+%% ?- tablero(3,3,T), ocupar(pos(0,1),T), vecinoLibre(pos(1,1),T,V).
+%% V = pos(2, 1) ;
+%% V = pos(1, 2) ;
+%% V = pos(1, 0) ;
+%% false.
 %%%%%%%%%%%%%%%%%%%%%%%%
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Definicion de caminos
@@ -77,17 +76,18 @@ false.
 %% Notar que la cantidad de caminos es finita y por ende se tiene que poder recorrer
 %% todas las alternativas eventualmente.
 %% Consejo: Utilizar una lista auxiliar con las posiciones visitadas
-camino(P,P,_,[P]).
+ocupada(pos(F,C),T) :- nth0(F,T,FIL), nth0(C,FIL,CEL), CEL==ocupada.
+camino(P,P,T,[P]) :- not(ocupada(P,T)).
 camino(INI,FIN,T,CAM) :- INI\==FIN, ocupar(INI,T), vecinoLibre(INI,T,VECINO), camino(VECINO,FIN,T,CAM2), CAM=[INI|CAM2].
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
 %%%%%%%%%%%%%%%%%%%%%%%%
-?- tablero(3,3,T), ocupar(pos(0,1),T), camino(pos(0,0),pos(0,2),T,C).
-C = [pos(0, 0), pos(1, 0), pos(2, 0), pos(2, 1), pos(1, 1), pos(1, 2), pos(0, 2)] ;
-C = [pos(0, 0), pos(1, 0), pos(2, 0), pos(2, 1), pos(2, 2), pos(1, 2), pos(0, 2)] ;
-C = [pos(0, 0), pos(1, 0), pos(1, 1), pos(2, 1), pos(2, 2), pos(1, 2), pos(0, 2)] ;
-C = [pos(0, 0), pos(1, 0), pos(1, 1), pos(1, 2), pos(0, 2)] ;
-false.
+%% ?- tablero(3,3,T), ocupar(pos(0,1),T), camino(pos(0,0),pos(0,2),T,C).
+%% C = [pos(0, 0), pos(1, 0), pos(2, 0), pos(2, 1), pos(1, 1), pos(1, 2), pos(0, 2)] ;
+%% C = [pos(0, 0), pos(1, 0), pos(2, 0), pos(2, 1), pos(2, 2), pos(1, 2), pos(0, 2)] ;
+%% C = [pos(0, 0), pos(1, 0), pos(1, 1), pos(2, 1), pos(2, 2), pos(1, 2), pos(0, 2)] ;
+%% C = [pos(0, 0), pos(1, 0), pos(1, 1), pos(1, 2), pos(0, 2)] ;
+%% false.
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Ejercicio 6
@@ -100,9 +100,9 @@ cantidadDeCaminoDual(INI,FIN,T1,T2,N) :- aggregate_all(count,caminoDual(INI,FIN,
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
 %%%%%%%%%%%%%%%%%%%%%%%%
-?- tablero(3,3,T), ocupar(pos(0,1),T), cantidadDeCaminos(pos(0,0),pos(0,2),T,N).
-N = 4 ;
-false.
+%% ?- tablero(3,3,T), ocupar(pos(0,1),T), cantidadDeCaminos(pos(0,0),pos(0,2),T,N).
+%% N = 4 ;
+%% false.
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Ejercicio 7
@@ -112,7 +112,7 @@ false.
 %% Una solución es mejor mientras menos pasos se deba dar para llegar a
 %% destino (distancia Manhattan). Por lo tanto, el predicado deberá devolver de a uno,
 %% todos los caminos pero en orden creciente de longitud.
-camino2(P,P,_,[P]).
+camino2(P,P,T,[P]) :- not(ocupada(P,T)).
 camino2(INI,FIN,T,CAM) :- INI\==FIN, ocupar(INI,T), mejorVecinoLibre(INI,FIN,T,VECINO), camino2(VECINO,FIN,T,CAM2), CAM=[INI|CAM2].
 
 distancia(pos(F1,C1), pos(F2,C2), D) :- abs(F1-F2,DIFF1), abs(C1-C2,DIFF2), D is DIFF1+DIFF2. 
@@ -122,12 +122,12 @@ mejorVecinoLibre(POS,FIN,T,VL) :- findall(V,vecinoLibre(POS,T,V),LISTAVL), map_l
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
 %%%%%%%%%%%%%%%%%%%%%%%% 
-?- tablero(3,3,T), ocupar(pos(0,1),T), camino2(pos(0,0),pos(0,2),T,C).
-C = [pos(0, 0), pos(1, 0), pos(1, 1), pos(1, 2), pos(0, 2)] ;
-C = [pos(0, 0), pos(1, 0), pos(1, 1), pos(2, 1), pos(2, 2), pos(1, 2), pos(0, 2)] ;
-C = [pos(0, 0), pos(1, 0), pos(2, 0), pos(2, 1), pos(1, 1), pos(1, 2), pos(0, 2)] ;
-C = [pos(0, 0), pos(1, 0), pos(2, 0), pos(2, 1), pos(2, 2), pos(1, 2), pos(0, 2)] ;
-false.
+%% ?- tablero(3,3,T), ocupar(pos(0,1),T), camino2(pos(0,0),pos(0,2),T,C).
+%% C = [pos(0, 0), pos(1, 0), pos(1, 1), pos(1, 2), pos(0, 2)] ;
+%% C = [pos(0, 0), pos(1, 0), pos(1, 1), pos(2, 1), pos(2, 2), pos(1, 2), pos(0, 2)] ;
+%% C = [pos(0, 0), pos(1, 0), pos(2, 0), pos(2, 1), pos(1, 1), pos(1, 2), pos(0, 2)] ;
+%% C = [pos(0, 0), pos(1, 0), pos(2, 0), pos(2, 1), pos(2, 2), pos(1, 2), pos(0, 2)] ;
+%% false.
 %%%%%%%%%%%%%%%%%%%%%%%%                                
 
 %% Ejercicio 8
@@ -141,7 +141,7 @@ false.
 %% En este ejercicio se permiten el uso de predicados: dynamic/1, asserta/1, assertz/1 y retractall/1.
 camino3(INI,FIN,T,CAM) :- retractall(caminoMinimo(_)), retractall(posInicial(_)), assert(posInicial(INI)), cam3(INI,FIN,T,CAM,1).
 
-cam3(P,P,_,[P],_).
+cam3(P,P,T,[P],_) :- not(ocupada(P,T)).
 cam3(INI,FIN,T,CAM,L) :- INI\==FIN, evalRec(L), ocupar(INI,T), mejorVecinoLibre(INI,FIN,T,VECINO), L2 is L+1, cam3(VECINO,FIN,T,CAM2,L2), CAM=[INI|CAM2], length(CAM,LEN), actualizaCamMin(INI,LEN).
 
 evalRec(L) :- caminoMinimo(LEN), LEN=<L, fail.
@@ -158,9 +158,9 @@ actualizaCamMin(P,L) :- not(caminoMinimo(_)), posInicial(P), assert(caminoMinimo
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
 %%%%%%%%%%%%%%%%%%%%%%%% 
-?- tablero(3,3,T), ocupar(pos(0,1),T), camino3(pos(0,0),pos(0,2),T,C).
-C = [pos(0, 0), pos(1, 0), pos(1, 1), pos(1, 2), pos(0, 2)] ;
-false.
+%% ?- tablero(3,3,T), ocupar(pos(0,1),T), camino3(pos(0,0),pos(0,2),T,C).
+%% C = [pos(0, 0), pos(1, 0), pos(1, 1), pos(1, 2), pos(0, 2)] ;
+%% false.
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -180,11 +180,10 @@ posLibre(pos(F,C),T) :- nth0(F,T,FIL), nth0(C,FIL,CEL), CEL\==ocupada.
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
 %%%%%%%%%%%%%%%%%%%%%%%%
-?- tablero(3,3,T), ocupar(pos(0,1),T), tablero(3,3,T2), ocupar(pos(2,1),T2), caminoDual(pos(0,0),pos(0,2),T,T2,C).
-C = [pos(0, 0), pos(1, 0), pos(1, 1), pos(1, 2), pos(0, 2)] ;
-false.
+%% ?- tablero(3,3,T), ocupar(pos(0,1),T), tablero(3,3,T2), ocupar(pos(2,1),T2), caminoDual(pos(0,0),pos(0,2),T,T2,C).
+%% C = [pos(0, 0), pos(1, 0), pos(1, 1), pos(1, 2), pos(0, 2)] ;
+%% false.
 %%%%%%%%%%%%%%%%%%%%%%%%
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Tableros de ejemplo
@@ -207,3 +206,6 @@ tablero(ej5x5b,T) :- tablero(5,5,T), ocupar(pos(1,1),T), ocupar(pos(1,2),T), ocu
 
 %% Tablero 5x5 vacio
 tablero(ej5x5vacio,T) :- tablero(5,5,T).
+
+%% Tablero 2x2 Ocupado
+tablero(ejOcupado,T) :- tablero(2,2,T), ocupar(pos(0,0),T), ocupar(pos(0,1),T), ocupar(pos(1,0),T), ocupar(pos(1,1),T).
