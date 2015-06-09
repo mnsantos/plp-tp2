@@ -8,16 +8,17 @@
 tablero(1,C,T) :- length(COLS,C), T=[COLS].
 tablero(F,C,T) :- F>1, C>0, F2 is F-1, length(COLS,C), tablero(F2,C,T2), T=[COLS|T2].
 %%%%%%%%%%%%%%%%%%%%%%%%
+%% Detalle
+%%%%%%%%%%%%%%%%%%%%%%%%
+%% Como precondicion, Filas y Columnas son valores positivos. Con el uso de length, 
+%% se generan de forma recursiva las filas con celdas libres del tamaño adecuado
+%% de columnas hasta completar el tablero.
+%%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% ?- tablero(3,3,T).
 %% T = [[_G4763, _G4766, _G4769], [_G4772, _G4775, _G4778], [_G4781, _G4784, _G4787]] ;
 %% false.
-%%%%%%%%%%%%%%%%%%%%%%%%
-%% Detalle
-%%%%%%%%%%%%%%%%%%%%%%%%
-%% -tablero- toma la cantidad de filas y columnas del tablero como parametros instanciados
-%% y el tablero a instanciar. Como precondicion, Filas y Columnas son valores positivos.
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Ejercicio 2
