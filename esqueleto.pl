@@ -76,8 +76,7 @@ vecinoLibre(P,T,pos(F,C)) :- vecino(P,T,pos(F,C)), nth0(F,T,FIL), nth0(C,FIL,CEL
 %% Notar que la cantidad de caminos es finita y por ende se tiene que poder recorrer
 %% todas las alternativas eventualmente.
 %% Consejo: Utilizar una lista auxiliar con las posiciones visitadas
-ocupada(pos(F,C),T) :- nth0(F,T,FIL), nth0(C,FIL,CEL), CEL==ocupada.
-camino(P,P,T,[P]) :- not(ocupada(P,T)).
+camino(P,P,_,[P]).
 camino(INI,FIN,T,CAM) :- INI\==FIN, ocupar(INI,T), vecinoLibre(INI,T,VECINO), camino(VECINO,FIN,T,CAM2), CAM=[INI|CAM2].
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
@@ -100,7 +99,6 @@ cantidadDeCaminoDual(INI,FIN,T1,T2,N) :- aggregate_all(count,caminoDual(INI,FIN,
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
 %%%%%%%%%%%%%%%%%%%%%%%%
-
 %% ?- tablero(3,3,T), ocupar(pos(0,1),T), cantidadDeCaminos(pos(0,0),pos(0,2),T,N).
 %% N = 4 ;
 %% false.
@@ -115,7 +113,7 @@ cantidadDeCaminoDual(INI,FIN,T1,T2,N) :- aggregate_all(count,caminoDual(INI,FIN,
 %% Una solución es mejor mientras menos pasos se deba dar para llegar a
 %% destino (distancia Manhattan). Por lo tanto, el predicado deberá devolver de a uno,
 %% todos los caminos pero en orden creciente de longitud.
-camino2(P,P,T,[P]) :- not(ocupada(P,T)).
+camino2(P,P,_,[P]).
 camino2(INI,FIN,T,CAM) :- INI\==FIN, ocupar(INI,T), mejorVecinoLibre(INI,FIN,T,VECINO), camino2(VECINO,FIN,T,CAM2), CAM=[INI|CAM2].
 
 %% distancia(+Pos1, +Pos2, -Distancia)
@@ -187,6 +185,7 @@ actualizaCamMin(P,L) :- not(caminoMinimo(_)), posInicial(P), assert(caminoMinimo
 caminoDual(P,P,_,_,[P]).
 caminoDual(INI,FIN,T1,T2,CAM) :- INI\==FIN, ocupar(INI,T1), mejorVecinoLibre(INI,FIN,T1,VECINO), posLibre(VECINO,T2), caminoDual(VECINO,FIN,T1,T2,CAM2), CAM=[INI|CAM2].
 
+%% posLibre(+Pos, ?Tablero)
 posLibre(pos(F,C),T) :- nth0(F,T,FIL), nth0(C,FIL,CEL), CEL\==ocupada.
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
