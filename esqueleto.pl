@@ -103,6 +103,8 @@ cantidadDeCaminoDual(INI,FIN,T1,T2,N) :- aggregate_all(count,caminoDual(INI,FIN,
 ?- tablero(3,3,T), ocupar(pos(0,1),T), cantidadDeCaminos(pos(0,0),pos(0,2),T,N).
 N = 4 ;
 false.
+?- tablero(3,3,T), ocupar(pos(0,1),T), cantidadDeCaminos(pos(0,0),pos(0,2),T,5).
+false.
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Ejercicio 7
