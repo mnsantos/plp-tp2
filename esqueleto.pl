@@ -147,7 +147,7 @@ mejorVecinoLibre(POS,FIN,T,VL) :- findall(V,vecinoLibre(POS,T,V),LISTAVL), map_l
 camino3(INI,FIN,T,CAM) :- retractall(caminoMinimo(_)), retractall(posInicial(_)), assert(posInicial(INI)), cam3(INI,FIN,T,CAM,1).
 
 %% cam3(+Inicio, +Fin, +Tablero, -Camino, +LongitudCamino)
-cam3(P,P,_,[P],_).
+cam3(P,P,T,[P],_) :- not(ocupada(P,T)).
 cam3(INI,FIN,T,CAM,L) :- INI\==FIN, evalRec(L), ocupar(INI,T), mejorVecinoLibre(INI,FIN,T,VECINO), L2 is L+1, cam3(VECINO,FIN,T,CAM2,L2), CAM=[INI|CAM2], length(CAM,LEN), actualizaCamMin(INI,LEN).
 
 %% evalRec(+LongitudCamino)
