@@ -131,6 +131,14 @@ cantidadDeCaminos2(INI,FIN,T,N) :- aggregate_all(count,camino2(INI,FIN,T,_),N).
 cantidadDeCaminos3(INI,FIN,T,N) :- aggregate_all(count,camino3(INI,FIN,T,_),N).
 cantidadDeCaminoDual(INI,FIN,T1,T2,N) :- aggregate_all(count,caminoDual(INI,FIN,T1,T2,_),N).
 %%%%%%%%%%%%%%%%%%%%%%%%
+%% Detalle
+%%%%%%%%%%%%%%%%%%%%%%%%
+%% Utilizando aggregate_all, se generan todas las soluciones y luego son contadas, 
+%% unificando esta suma con el resultado.
+%% Para realizar pruebas y comparaciones, no solo definimos cantidadDeCaminos que
+%% se relaciona con caminos, sino que tambien definimos los propios para los
+%% predicados camino2, camino2 y caminoDual, respectivamente.
+%%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% ?- tablero(3,3,T), ocupar(pos(0,1),T), cantidadDeCaminos(pos(0,0),pos(0,2),T,N).
@@ -138,10 +146,6 @@ cantidadDeCaminoDual(INI,FIN,T1,T2,N) :- aggregate_all(count,caminoDual(INI,FIN,
 %% false.
 %% ?- tablero(3,3,T), ocupar(pos(0,1),T), cantidadDeCaminos(pos(0,0),pos(0,2),T,5).
 %% false.
-%%%%%%%%%%%%%%%%%%%%%%%%
-%% Detalle
-%%%%%%%%%%%%%%%%%%%%%%%%
-%% -cantidadDeCaminosX- cuenta en definitiva cuantos caminos genera la funcion caminoX en total, ya sea camino1, 2, 3 o Dual.
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Ejercicio 7
