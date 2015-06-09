@@ -103,7 +103,7 @@ actualizaCamMin(P,L) :- not(caminoMinimo(_)), posInicial(P), assert(caminoMinimo
 %% sólo por celdas transitables de ambos tableros.
 %% Nota: Es posible una implementación que resuelva en forma inmediata casos en los que trivialmente no existe camino dual posible.
 caminoDual(P,P,_,_,[P]).
-caminoDual(INI,FIN,T1,T2,CAM) :- INI\==FIN, ocupar(INI,T1), mejorVecinoLibre(INI,FIN,T1,VECINO), posLibre(VECINO,T2),caminoDual(VECINO,FIN,T1,T2,CAM2), CAM=[INI|CAM2].
+caminoDual(INI,FIN,T1,T2,CAM) :- INI\==FIN, ocupar(INI,T1), mejorVecinoLibre(INI,FIN,T1,VECINO), posLibre(VECINO,T2), caminoDual(VECINO,FIN,T1,T2,CAM2), CAM=[INI|CAM2].
 
 posLibre(pos(F,C),T) :- nth0(F,T,FIL), nth0(C,FIL,CEL), CEL\==ocupada.
 
@@ -117,6 +117,9 @@ tablero(ej1,T) :- tablero(3,3,T).
 
 %% Ocupado solo el centro de 3x3
 tablero(ej2,T) :- tablero(3,3,T), ocupar(pos(1,1),T).
+
+%% Ocupado el centro y derecha centro de 3x3
+tablero(ej3,T) :- tablero(3,3,T), ocupar(pos(1,1),T), ocupar(pos(1,2),T).
 
 %% Figura 1 de 5x5
 tablero(ej5x5,T) :- tablero(5,5,T), ocupar(pos(1,1),T), ocupar(pos(1,2),T).
