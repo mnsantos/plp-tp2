@@ -14,6 +14,11 @@ tablero(F,C,T) :- F>1, C>0, F2 is F-1, length(COLS,C), tablero(F2,C,T2), T=[COLS
 %% T = [[_G4763, _G4766, _G4769], [_G4772, _G4775, _G4778], [_G4781, _G4784, _G4787]] ;
 %% false.
 %%%%%%%%%%%%%%%%%%%%%%%%
+%% Detalle
+%%%%%%%%%%%%%%%%%%%%%%%%
+%% -tablero- toma la cantidad de filas y columnas del tablero como parametros instanciados
+%% y el tablero a instanciar. Como precondicion, Filas y Columnas son valores positivos.
+%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Ejercicio 2
 %% ocupar(+Pos,?Tablero) será verdadero cuando la posición indicada esté ocupada.
@@ -25,11 +30,17 @@ ocupar(pos(F,C),T) :- nth0(F,T,FILA), nth0(C,FILA,CELDA), CELDA=ocupada.
 %% T = [[_G529, ocupada, _G535], [_G538, _G541, _G544], [_G547, _G550, _G553]] ;
 %% false.
 %%%%%%%%%%%%%%%%%%%%%%%%
+%% Detalle
+%%%%%%%%%%%%%%%%%%%%%%%%
+%% -ocupar- toma una posicion instanciada y un tablero. Si el tablero se encuentra instanciado
+%% determina si esa posicion se corresponde con una celda ocupada o no. De otra forma recorre
+%% las filas y columnas de dicho tablero hasta la posicion correspondiente y la setea como ocupada.
+%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Ejercicio 3
 %% vecino(+Pos, +Tablero, -PosVecino) será verdadero cuando PosVecino sea
 %% un átomo de la forma pos(F', C') y pos(F',C') sea una celda contigua a
-%% pos(F,C), donde Pos=pos(F,C). Las celdas contiguas puede ser a lo sumo cuatro
+%% pos(F,C), donde Pos=pos(F,C). Las celdas contiguas pueden ser a lo sumo cuatro
 %% dado que el robot se moverá en forma ortogonal.
 vecino(pos(F,C),T,pos(NORTE,C)) :-  NORTE is F-1, nth0(NORTE,T,FIL), nth0(C,FIL,_).
 vecino(pos(F,C),T,pos(SUR,C)) :-  SUR is F+1, nth0(SUR,T,FIL), nth0(C,FIL,_).
@@ -49,6 +60,12 @@ vecino(pos(F,C),T,pos(F,OESTE)) :-  OESTE is C-1, nth0(F,T,FIL), nth0(OESTE,FIL,
 %% V = pos(1, 0) ;
 %% false.
 %%%%%%%%%%%%%%%%%%%%%%%%
+%% Detalle
+%%%%%%%%%%%%%%%%%%%%%%%%
+%% Dados un tablero y una posicion, instancia PosVecino de forma tal que se encuentre
+%% arriba/abajo o a izquierda/derecha de la posicion parametro, de no estar dicha posicion en
+%% el borde del tablero. 
+%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Ejercicio 4
 %% vecinoLibre(+Pos, +Tablero, -PosVecino) idem vecino/3 pero además PosVecino
@@ -62,6 +79,11 @@ vecinoLibre(P,T,pos(F,C)) :- vecino(P,T,pos(F,C)), nth0(F,T,FIL), nth0(C,FIL,CEL
 %% V = pos(1, 2) ;
 %% V = pos(1, 0) ;
 %% false.
+%%%%%%%%%%%%%%%%%%%%%%%%
+%% Detalle
+%%%%%%%%%%%%%%%%%%%%%%%%
+%% -vecinoLibre- es una adaptacion de vecino que determina que posiciones vecinas a una posicion 
+%% determinada estan libres.
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -88,6 +110,12 @@ camino(INI,FIN,T,CAM) :- INI\==FIN, ocupar(INI,T), vecinoLibre(INI,T,VECINO), ca
 %% C = [pos(0, 0), pos(1, 0), pos(1, 1), pos(1, 2), pos(0, 2)] ;
 %% false.
 %%%%%%%%%%%%%%%%%%%%%%%%
+%% Detalle
+%%%%%%%%%%%%%%%%%%%%%%%%
+%% Todo -camino- parte de la precondicion de que la posicion inicial no esta ocupada. Luego determina
+%% caminos posibles a traves del tablero hasta llegar a la posicion final.
+%% -camino- construye una lista de posiciones pasando por vecinos libres, los cuales ocupa momentaneamente.
+%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Ejercicio 6
 %% cantidadDeCaminos(+Inicio, +Fin, +Tablero, ?N) que indique la cantidad de caminos
@@ -104,6 +132,10 @@ cantidadDeCaminoDual(INI,FIN,T1,T2,N) :- aggregate_all(count,caminoDual(INI,FIN,
 %% false.
 %% ?- tablero(3,3,T), ocupar(pos(0,1),T), cantidadDeCaminos(pos(0,0),pos(0,2),T,5).
 %% false.
+%%%%%%%%%%%%%%%%%%%%%%%%
+%% Detalle
+%%%%%%%%%%%%%%%%%%%%%%%%
+%% -cantidadDeCaminosX- cuenta en definitiva cuantos caminos genera la funcion caminoX en total, ya sea camino1, 2, 3 o Dual.
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Ejercicio 7
@@ -131,6 +163,12 @@ mejorVecinoLibre(POS,FIN,T,VL) :- findall(V,vecinoLibre(POS,T,V),LISTAVL), map_l
 %% C = [pos(0, 0), pos(1, 0), pos(2, 0), pos(2, 1), pos(1, 1), pos(1, 2), pos(0, 2)] ;
 %% C = [pos(0, 0), pos(1, 0), pos(2, 0), pos(2, 1), pos(2, 2), pos(1, 2), pos(0, 2)] ;
 %% false.
+%%%%%%%%%%%%%%%%%%%%%%%%
+%% Detalle
+%%%%%%%%%%%%%%%%%%%%%%%%
+%% -camino2- optimiza -camino- reduciendo la distancia recorrida, tratando heuristicamente de no alejarse demasiado del punto final
+%% si no es necesario. Para ello utiliza el predicado mejorVecinoLibre, que toma dos posiciones instanciadas (la posicion actual y la final)
+%% y determina el vecino libre que mas se acerca a la posicion final, utilizado el predicado distancia.
 %%%%%%%%%%%%%%%%%%%%%%%%                                
 
 %% Ejercicio 8
@@ -193,6 +231,14 @@ posLibre(pos(F,C),T) :- nth0(F,T,FIL), nth0(C,FIL,CEL), CEL\==ocupada.
 %% ?- tablero(3,3,T), ocupar(pos(0,1),T), tablero(3,3,T2), ocupar(pos(2,1),T2), caminoDual(pos(0,0),pos(0,2),T,T2,C).
 %% C = [pos(0, 0), pos(1, 0), pos(1, 1), pos(1, 2), pos(0, 2)] ;
 %% false.
+%%%%%%%%%%%%%%%%%%%%%%%%
+%% Detalle
+%%%%%%%%%%%%%%%%%%%%%%%%
+%% -caminoDual- funciona de manera muy similar a -camino2- construyendo el camino a medida que se avanza en el tablero T1 por los mejores vecinos
+%% (en cuanto a distancia hasta el final). Se diferencia por ir comprobando que dicho camino pueda resolverse tambien en el tablero T2 de manera incremental.
+%% Es por esto que se detecta la imposibilidad de caminoDual de manera temprana en tableros donde movimientos posibles en T1 no existan en T2.
+%% Para checkear si una posicion esta libre utilizamos el predicado auxiliar posLibre, que dada una posicion instanciada y un tablero instanciado (puede no serlo) 
+determina si la celda correspondiente a esa posicion no esta marcada como ocupada.
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%
