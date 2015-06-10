@@ -258,20 +258,23 @@ caminoDual(INI,FIN,T1,T2,CAM) :- INI\==FIN, ocupar(INI,T1), mejorVecinoLibre(INI
 %% posLibre(+Pos, ?Tablero)
 posLibre(pos(F,C),T) :- nth0(F,T,FIL), nth0(C,FIL,CEL), CEL\==ocupada.
 %%%%%%%%%%%%%%%%%%%%%%%%
+%% Detalle
+%%%%%%%%%%%%%%%%%%%%%%%%
+%% Como precondicion se asume que ambos tableros tienen las mismas dimensiones.
+%% Para realizar caminoDual se tomo una variacion de camino2 de forma tal que a medida que se construye
+%% el camino sobre el Tablero1 se verifica tambien que el vecino elegido este libre tambien en Tablero2
+%% de forma tal que la solucion satisfaga ambos tableros.
+%% Para realizar esta verificacion se utiliza el predicado auxiliar 'posLibre' que es verdadero cuando
+%% la posicion indicada esta libre en el tablero indicado, en este caso Tablero2.
+%% De esta forma se descartan los caminos que no son validos en ambos tableros.
+%%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% ?- tablero(3,3,T), ocupar(pos(0,1),T), tablero(3,3,T2), ocupar(pos(2,1),T2), caminoDual(pos(0,0),pos(0,2),T,T2,C).
 %% C = [pos(0, 0), pos(1, 0), pos(1, 1), pos(1, 2), pos(0, 2)] ;
 %% false.
 %%%%%%%%%%%%%%%%%%%%%%%%
-%% Detalle
-%%%%%%%%%%%%%%%%%%%%%%%%
-%% -caminoDual- funciona de manera muy similar a -camino2- construyendo el camino a medida que se avanza en el tablero T1 por los mejores vecinos
-%% (en cuanto a distancia hasta el final). Se diferencia por ir comprobando que dicho camino pueda resolverse tambien en el tablero T2 de manera incremental.
-%% Es por esto que se detecta la imposibilidad de caminoDual de manera temprana en tableros donde movimientos posibles en T1 no existan en T2.
-%% Para checkear si una posicion esta libre utilizamos el predicado auxiliar posLibre, que dada una posicion instanciada y un tablero instanciado (puede no serlo) 
-determina si la celda correspondiente a esa posicion no esta marcada como ocupada.
-%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Tableros de ejemplo
