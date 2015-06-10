@@ -10,7 +10,7 @@ tablero(F,C,T) :- F>1, C>0, F2 is F-1, length(COLS,C), tablero(F2,C,T2), T=[COLS
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Detalle
 %%%%%%%%%%%%%%%%%%%%%%%%
-%% Como precondicion, Filas y Columnas son valores positivos. Con el uso de length, 
+%% Como precondicion, Filas y Columnas son valores positivos. Con el uso de length 
 %% se generan de forma recursiva las filas con celdas libres del tamaño adecuado
 %% de columnas hasta completar el tablero.
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -28,7 +28,7 @@ ocupar(pos(F,C),T) :- nth0(F,T,FILA), nth0(C,FILA,CELDA), CELDA=ocupada.
 %% Detalle
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Utilizando el predicado nth0, primero se elige la fila del tablero y luego de esta fila 
-%% se elige la columna indicada, obteniendoce la celda de la posicion. 
+%% se elige la columna indicada, obteniendose la celda de la posicion. 
 %% Finalmente esta celda es unificada con ´ocupada´.
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
@@ -53,7 +53,7 @@ vecino(pos(F,C),T,pos(F,OESTE)) :-  OESTE is C-1, nth0(F,T,FIL), nth0(OESTE,FIL,
 %% Como en el ejercicio anterior, se hace uso del predicado nth0 para elegir las 
 %% cuatro posibles celdas vecinas y unificarlas con el resultado.
 %% Se hace provecho que nth0 falla cuando los indices estan fuera del
-%% tamañno del tablero y por ello no devuelve posiciones fuera de el.
+%% tamaño del tablero y por ello no devuelve posiciones fuera de el.
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -109,7 +109,7 @@ camino(INI,FIN,T,CAM) :- INI\==FIN, ocupar(INI,T), vecinoLibre(INI,T,VECINO), ca
 %% Como precondicion las posiciones de inicio y fin no deben estar ocupadas.
 %% El camino se construye de forma recursiva. Parte de la posicion inicial, se sigue por algun
 %% vecino libre y se actualiza la posicion inicial para el proximo paso recursivo. 
-%% Finaliza el camino solo si la posicion inicial conincide con la final. Para evitar ciclos,
+%% Finaliza el camino solo si la posicion inicial coincide con la final. Para evitar ciclos,
 %% en cada paso se ocupa la celda utilizada de forma tal que no pueda utilizarse nuevamente.
 %% De esta forma y gracias al backtraking se prueban todos los caminos posibles.
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -133,11 +133,11 @@ cantidadDeCaminoDual(INI,FIN,T1,T2,N) :- aggregate_all(count,caminoDual(INI,FIN,
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Detalle
 %%%%%%%%%%%%%%%%%%%%%%%%
-%% Utilizando aggregate_all, se generan todas las soluciones y luego son contadas, 
+%% Utilizando aggregate_all se generan todas las soluciones y luego son contadas, 
 %% unificando esta suma con el resultado.
 %% Para realizar pruebas y comparaciones, no solo definimos cantidadDeCaminos que
 %% se relaciona con camino, sino que tambien definimos los propios para los
-%% predicados camino2, camino2 y caminoDual, respectivamente.
+%% predicados camino2, camino3 y caminoDual, respectivamente.
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -170,8 +170,8 @@ mejorVecinoLibre(POS,FIN,T,VL) :- findall(V,vecinoLibre(POS,T,V),LISTAVL), map_l
 %% Para realizar camino2 se tomo como base camino. Para lograr una mejora de la heuristica solo fue necesario  
 %% utilizar una version optimizada del predicado original 'vecinoLibre' que fue reempazada por 'mejorVecinoLibre'.
 %% Esta nueva version, devuelve los mismos vecinos que su predecesora con la diferencia que los ordena  
-%% utilizando un criterio de distancia Manhattan. Priemero devuelve el veciono mas cercano a la posicion final. 
-%% De esta forma los primero caminos tienden a ser los mas cortos.
+%% utilizando un criterio de distancia Manhattan. Primero devuelve el vecino mas cercano a la posicion final. 
+%% De esta forma los primeros caminos tienden a ser los mas cortos.
 %% Para esto se hace uso de un predicado auxiliar, 'distancia' que calcula la distancia Manhattan.
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
@@ -262,7 +262,7 @@ posLibre(pos(F,C),T) :- nth0(F,T,FIL), nth0(C,FIL,CEL), CEL\==ocupada.
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Como precondicion se asume que ambos tableros tienen las mismas dimensiones.
 %% Para realizar caminoDual se tomo una variacion de camino2 de forma tal que a medida que se construye
-%% el camino sobre el Tablero1 se verifica tambien que el vecino elegido este libre tambien en Tablero2
+%% el camino sobre el Tablero1 se verifica ademas que el vecino elegido tambien este libre en Tablero2
 %% de forma tal que la solucion satisfaga ambos tableros.
 %% Para realizar esta verificacion se utiliza el predicado auxiliar 'posLibre' que es verdadero cuando
 %% la posicion indicada esta libre en el tablero indicado, en este caso Tablero2.
