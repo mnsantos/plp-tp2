@@ -215,6 +215,25 @@ actualizaCamMin(P,L) :- not(caminoMinimo(_)), posInicial(P), assert(caminoMinimo
 
 %% caminoMinimo(?LongitudCamino)
 :- dynamic caminoMinimo/1.
+%%%%%%%%%%%%%%%%%%%%%%%% 
+%% Detalle
+%%%%%%%%%%%%%%%%%%%%%%%%
+%% Para realizar camino3 se tomo como base camino2. Se hace uso de dos predicados dinamicos.
+%% Para tener de forma dinamica la logitud del camino mas chico encontrado en cada momento 
+%% se utiliza el predicado ´caminoMinimo´ que solo tiene un parametro y ese valor.
+%% Para realizar el calculo de la distancia de cada camino, es necesario el punto de inicio
+%% y este se define en el predicado 'posInicial'. Se opto por este predicado para no pasar
+%% mas parametro en otros predicados.
+%% Para lograr una reduccion drastica del espacio de busqueda se utiliza el predicado 'evalRec'
+%% que compara la longitud del camino parcial encontrado con la longitud del camino mas corto.
+%% En caso de ser mayor el camino parcial, este predicado falla reducionedo el espacio de busqueda.
+%% En caso que aun no se haya encontrado el primer camino y por ende no este definido 'caminoMinimo',
+%% se continua con la busqueda.
+%% Finalmente, cuando se encuentra un camino se actualiza la distancia del mejor camino segun
+%% corresponda utilizando el predicado 'actualizaCamMin'.
+%% La actualizacion solo se produce si la posicion pasada como parametro coincide con la pocicion
+%% inicial del camino (es decir no es un camino parcial) y la longitud pasada como parametro,
+%% no estaba definida o es menor que la anterior.
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
 %%%%%%%%%%%%%%%%%%%%%%%% 
