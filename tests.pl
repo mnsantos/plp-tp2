@@ -8,6 +8,8 @@ tableroTest(tableroTest2,T) :- tablero(1,1,T), ocupar(pos(0,0),T).
 tableroTest(tableroTest3,T) :- tablero(3,3,T), ocupar(pos(1,0),T), ocupar(pos(1,2),T).
 tableroTest(tableroTest4,T) :- tablero(3,3,T), ocupar(pos(1,0),T), ocupar(pos(1,1),T), ocupar(pos(0,1),T).
 tableroTest(tableroTest5,T) :- tablero(3,3,T), ocupar(pos(1,0),T), ocupar(pos(1,1),T).
+tableroTest(tableroTest6,T) :- tablero(3,3,T), ocupar(pos(0,1),T).
+tableroTest(tableroTest7,T) :- tablero(3,3,T), ocupar(pos(2,1),T).
 
 %% Test tablero
 test(tablero) :- tablero(2,2,T), length(T,2), nth0(0,T,F1), length(F1,2), nth0(1,T,F2), length(F2,2), !.
@@ -25,6 +27,7 @@ test(vecinoLibre) :- tableroTest(tableroTest1,T), findall(V,vecinoLibre(pos(0,1)
 %% Tests camino
 %% Verifica que la cantidad de caminos de camino sea correcta.
 test(camino) :- tableroTest(tableroTest1,T), cantidadDeCaminos(pos(0,0),pos(2,3),T,N), N is 287, !.
+test(camino) :- tableroTest(tableroTest6,T), camino(pos(0,0),pos(0,2),T,[pos(0, 0), pos(1, 0), pos(2, 0), pos(2, 1), pos(1, 1), pos(1, 2), pos(0, 2)]), !.
 
 %% Tests camino2
 %% Verifica que la cantidad de caminos de camino2 sea correcta.
@@ -37,6 +40,7 @@ test(camino3) :- tableroTest(tableroTest1,T), camino3(pos(0,0),pos(2,3),T,C), le
 %% Tests caminoDual
 test(caminoDual) :- tableroTest(tableroTest3,T1), tableroTest(tableroTest4,T2), not(caminoDual(pos(0,0),pos(2,2),T1,T2,_)), !.
 test(caminoDual) :- tableroTest(tableroTest3,T1), tableroTest(tableroTest5,T2), not(caminoDual(pos(0,0),pos(2,2),T1,T2,_)), !.
+test(caminoDual) :- tableroTest(tableroTest6,T1), tableroTest(tableroTest7,T2), caminoDual(pos(0,0),pos(0,2),T1,T2,[pos(0,0), pos(1,0), pos(1,1), pos(1,2), pos(0,2)]), !.
 
 :- end_tests(esqueleto).
 

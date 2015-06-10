@@ -29,7 +29,7 @@ ocupar(pos(F,C),T) :- nth0(F,T,FILA), nth0(C,FILA,CELDA), CELDA=ocupada.
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Utilizando el predicado nth0, primero se elige la fila del tablero y luego de esta fila 
 %% se elige la columna indicada, obteniendoce la celda de la posicion. 
-%% Finalmente esta celda es unificada con ´ocupada´
+%% Finalmente esta celda es unificada con ´ocupada´.
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
 %%%%%%%%%%%%%%%%%%%%%%%%
@@ -106,11 +106,11 @@ camino(INI,FIN,T,CAM) :- INI\==FIN, ocupar(INI,T), vecinoLibre(INI,T,VECINO), ca
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Detalle
 %%%%%%%%%%%%%%%%%%%%%%%%
-%% Como precondicion las posiciones de inicio y final no deben estar ocupadas.
-%% El camino se construye de forma recursiva. Partiendo de la posicion inicial, se sigue por algun
+%% Como precondicion las posiciones de inicio y fin no deben estar ocupadas.
+%% El camino se construye de forma recursiva. Parte de la posicion inicial, se sigue por algun
 %% vecino libre y se actualiza la posicion inicial para el proximo paso recursivo. 
-%% Finalizando el camino solo si la posicion inicial conincide con la final. Para evitar ciclos,
-%% en cada paso se va ocupando la celda utilizada de tal forma que no pueda utilizarse nuevamente.
+%% Finaliza el camino solo si la posicion inicial conincide con la final. Para evitar ciclos,
+%% en cada paso se ocupa la celda utilizada de forma tal que no pueda utilizarse nuevamente.
 %% De esta forma y gracias al backtraking se prueban todos los caminos posibles.
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
@@ -136,7 +136,7 @@ cantidadDeCaminoDual(INI,FIN,T1,T2,N) :- aggregate_all(count,caminoDual(INI,FIN,
 %% Utilizando aggregate_all, se generan todas las soluciones y luego son contadas, 
 %% unificando esta suma con el resultado.
 %% Para realizar pruebas y comparaciones, no solo definimos cantidadDeCaminos que
-%% se relaciona con caminos, sino que tambien definimos los propios para los
+%% se relaciona con camino, sino que tambien definimos los propios para los
 %% predicados camino2, camino2 y caminoDual, respectivamente.
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
@@ -168,11 +168,11 @@ mejorVecinoLibre(POS,FIN,T,VL) :- findall(V,vecinoLibre(POS,T,V),LISTAVL), map_l
 %% Detalle
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Para realizar camino2 se tomo como base camino. Para lograr una mejora de la heuristica solo fue necesario  
-%% utilizar una version optimizada del predicado original vecinoLibre que fue reempazada por mejorVecinoLibre.
-%% Esta nueva version, devuelve los mismos vecinos que su predecesora solo que esta version los ordena  
+%% utilizar una version optimizada del predicado original 'vecinoLibre' que fue reempazada por 'mejorVecinoLibre'.
+%% Esta nueva version, devuelve los mismos vecinos que su predecesora con la diferencia que los ordena  
 %% utilizando un criterio de distancia Manhattan. Priemero devuelve el veciono mas cercano a la posicion final. 
 %% De esta forma los primero caminos tienden a ser los mas cortos.
-%% Para esto se hace uso de un predicados auxiliare, 'distancia' que calcula la distancia Manhattan.
+%% Para esto se hace uso de un predicado auxiliar, 'distancia' que calcula la distancia Manhattan.
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
 %%%%%%%%%%%%%%%%%%%%%%%% 
@@ -220,19 +220,19 @@ actualizaCamMin(P,L) :- not(caminoMinimo(_)), posInicial(P), assert(caminoMinimo
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Para realizar camino3 se tomo como base camino2. Se hace uso de dos predicados dinamicos.
 %% Para tener de forma dinamica la logitud del camino mas chico encontrado en cada momento 
-%% se utiliza el predicado ´caminoMinimo´ que solo tiene un parametro y ese valor.
+%% se utiliza el predicado 'caminoMinimo' que solo tiene un parametro y ese valor.
 %% Para realizar el calculo de la distancia de cada camino, es necesario el punto de inicio
 %% y este se define en el predicado 'posInicial'. Se opto por este predicado para no pasar
-%% mas parametro en otros predicados.
+%% mas parametros en otros predicados.
 %% Para lograr una reduccion drastica del espacio de busqueda se utiliza el predicado 'evalRec'
 %% que compara la longitud del camino parcial encontrado con la longitud del camino mas corto.
-%% En caso de ser mayor el camino parcial, este predicado falla reducionedo el espacio de busqueda.
+%% En caso de ser mayor el camino parcial, este predicado falla reduciendo el espacio de busqueda.
 %% En caso que aun no se haya encontrado el primer camino y por ende no este definido 'caminoMinimo',
 %% se continua con la busqueda.
 %% Finalmente, cuando se encuentra un camino se actualiza la distancia del mejor camino segun
 %% corresponda utilizando el predicado 'actualizaCamMin'.
-%% La actualizacion solo se produce si la posicion pasada como parametro coincide con la pocicion
-%% inicial del camino (es decir no es un camino parcial) y la longitud pasada como parametro,
+%% La actualizacion solo se produce si la posicion pasada como parametro coincide con la posicion
+%% inicial del camino (es decir no es un camino parcial) y la longitud pasada como parametro
 %% no estaba definida o es menor que la anterior.
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
