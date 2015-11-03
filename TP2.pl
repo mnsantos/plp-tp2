@@ -225,7 +225,8 @@ construir2(T,P,SOL):- retractall(lookUp(_,_,_,_)), generar2(T,P,T,SOL), cumpleLi
 generar2(0,_,_,[]).
 generar2(T,P,K,SOL):- T>0, lookUp(T,P,K,SOL).
 generar2(T,P,K,SOL):- T>0, K>0, L is K-1, generar2(T,P,L,SOL), not(lookUp(T,P,K,SOL)), assert(lookUp(T,P,K,SOL)).
-generar2(T,P,K,SOL):- T>0, dameMax(P,K,L), M is T-L, between(0,M,T1), T2 is T-L-T1, L2 is L-1, generar2(T1,P,L2,SOL1), generar2(T2,P,L,SOL2), append(SOL1, [K|SOL2], SOL), not(lookUp(T,P,K,SOL)), assert(lookUp(T,P,K,SOL)).
+generar2(T,P,K,SOL):- T>0, dameMax(P,K,L), M is T-L, between(0,M,T1), T2 is T-L-T1, L2 is L-1, generar2(T1,P,L2,SOL1),
+					 generar2(T2,P,L,SOL2), append(SOL1, [K|SOL2], SOL), not(lookUp(T,P,K,SOL)), assert(lookUp(T,P,K,SOL)).
 
 :- dynamic lookUp/4.
 
@@ -244,13 +245,36 @@ dameMaxAux([X|REV],K,L):- X>K, dameMaxAux(REV,K,L).
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
 %%%%%%%%%%%%%%%%%%%%%%%% 
-%% 
+%% % Resultado:
+%% ?- ejemploConstruir2(SOL) :- nPiezasDeCada(2,[3,1,2],P), construir2(5,P,SOL).
+%%
+%% SOL = [2, 2, 1] ;
+%% SOL = [2, 1, 2] ;
+%% SOL = [1, 2, 2] ;
+%% SOL = [3, 1, 1] ;
+%% SOL = [3, 2] ;
+%% SOL = [1, 3, 1] ;
+%% SOL = [1, 1, 3] ;
+%% SOL = [2, 3] ;
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 % ####################################
 % Comparación de resultados y tiempos
 % ####################################
 
+% Los tiempos hallados para cada implementacion de construir son:
+%
+% ?- ejemploTimeConstruir1(T).
+% 582 inferences, 0.000 CPU in 0.000 seconds (98% CPU, 2220891 Lips)
+% T = 8.
+%
+% ?- ejemploTimeConstruir2(T).
+% 4,673 inferences, 0.001 CPU in 0.001 seconds (100% CPU, 4325238 Lips)
+% T = 8.
+%
+% Esperabamos que construir2 insumiera menos tiempo por el dinamismo y la reutilizacion de resultados
+% generados pero no fue asi. Creemos que esto se debe a un error en la implementacion.
+%
 %%% Ejercicio 8
 
 % todosConstruir1(+Total, +Piezas, -Soluciones, -N), donde Soluciones representa una lista con todas las
@@ -403,7 +427,17 @@ ejemploConstruir1(SOL) :- nPiezasDeCada(2,[3,1,2],P), construir1(5,P,SOL).
 
 ejemploConstruir2(SOL) :- nPiezasDeCada(2,[3,1,2],P), construir2(5,P,SOL).
 
-% Resultado: FALTA!
+% Resultado:
+% ?- ejemploConstruir2(SOL).
+% SOL = [2, 2, 1] ;
+% SOL = [2, 1, 2] ;
+% SOL = [1, 2, 2] ;
+% SOL = [3, 1, 1] ;
+% SOL = [3, 2] ;
+% SOL = [1, 3, 1] ;
+% SOL = [1, 1, 3] ;
+% SOL = [2, 3] ;
+
 
 ejemploTodosConstruir1(N) :- nPiezasDeCada(2,[3,1,2],P), todosConstruir1(5,P,_,N).
 
@@ -417,13 +451,17 @@ ejemploTodosConstruir2(N) :- nPiezasDeCada(2,[3,1,2],P), todosConstruir2(5,P,_,N
 % N = 8 ;
 % false.
 
-ejemploTimeConstruir1 :- time(construir1(5,[pieza(3,2),pieza(1,2),pieza(2,2)],_)).
+ejemploTimeConstruir1(T) :- time(todosConstruir1(5,[pieza(3,2),pieza(1,2),pieza(2,2)],_,T)).
 
-% Resultado: FALTA!
+% ?- ejemploTimeConstruir1(T).
+% 582 inferences, 0.000 CPU in 0.000 seconds (98% CPU, 2220891 Lips)
+% T = 8.
 
-ejemploTimeConstruir2 :- time(construir2(5,[pieza(3,2),pieza(1,2),pieza(2,2)],_)).
+ejemploTimeConstruir2(T) :- time(todosConstruir2(5,[pieza(3,2),pieza(1,2),pieza(2,2)],_, T)).
 
-% Resultado: FALTA!
+% ?- ejemploTimeConstruir2(T).
+% 4,673 inferences, 0.001 CPU in 0.001 seconds (100% CPU, 4325238 Lips)
+% T = 8.
 
 ejemploConstruirConPatron(PAT,SOL) :- construirConPatron(5, [pieza(3,2),pieza(1,2),pieza(2,2)], PAT, SOL).
 
