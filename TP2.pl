@@ -82,7 +82,20 @@ construir1(T,P,SOL):- generar(T,P,SOL), cumpleLimite(P,SOL).
 %  definiciones dinámicas para persistir los cálculos auxiliares realizados y evitar repetirlos. 
 %  No se espera que las soluciones aparezcan en el mismo orden entre construir1/3 y construir2/3, pero sí, sean las mismas.
 
- construir2(_,_,_):- fail.
+construir2(T,P,SOL):- retractall(lookUp(_,_,_,_)), generar2(T,P,T,SOL), cumpleLimite(P,SOL).
+
+generar2(0,_,_,[]).
+generar2(T,P,K,SOL):- T>0, lookUp(T,P,K,SOL), !.
+generar2(T,P,K,SOL):- T>0, K>0, L is K-1, generar2(T,P,L,SOL), asserta(lookUp(T,P,L,SOL)).
+generar2(T,P,K,SOL):- T>0, dameMax(P,K,L), M is T-L, between(0,M,T1), T2 is T-L-T1, L2 is L-1, generar2(T1,P,L2,SOL1), generar2(T2,P,L,SOL2), append(SOL1, [K|SOL2], SOL), asserta(lookUp(T,P,K,SOL)).
+ 
+
+:- dynamic lookUp/4.
+
+dameMax(P,K,L):- tamanios(P,TS), sort(TS,TSORD), reverse(TSORD, REV), dameMaxAux(REV,K,L).
+
+dameMaxAux([X|_],K,L):- X=<K, L=X, !. 
+dameMaxAux([X|REV],K,L):- X>K, dameMaxAux(REV,K,L).
 
 % ####################################
 % Comparación de resultados y tiempos
