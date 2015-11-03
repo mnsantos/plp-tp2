@@ -162,28 +162,23 @@ noSuperaLimite(pieza(T,C),[pieza(T2,_)|PIEZAS]):- T=\=T2, noSuperaLimite(pieza(T
 %%%%%%%%%%%%%%%%%%%%%%%% 
 %% Detalle
 %%%%%%%%%%%%%%%%%%%%%%%%
-%% Para realizar camino3 se tomo como base camino2. Se hace uso de dos predicados dinamicos.
-%% Para tener de forma dinamica la logitud del camino mas chico encontrado en cada momento 
-%% se utiliza el predicado 'caminoMinimo' que solo tiene un parametro y ese valor.
-%% Para realizar el calculo de la distancia de cada camino, es necesario el punto de inicio
-%% y este se define en el predicado 'posInicial'. Se opto por este predicado para no pasar
-%% mas parametros en otros predicados.
-%% Para lograr una reduccion drastica del espacio de busqueda se utiliza el predicado 'evalRec'
-%% que compara la longitud del camino parcial encontrado con la longitud del camino mas corto.
-%% En caso de ser mayor el camino parcial, este predicado falla reduciendo el espacio de busqueda.
-%% En caso que aun no se haya encontrado el primer camino y por ende no este definido 'caminoMinimo',
-%% se continua con la busqueda.
-%% Finalmente, cuando se encuentra un camino se actualiza la distancia del mejor camino segun
-%% corresponda utilizando el predicado 'actualizaCamMin'.
-%% La actualizacion solo se produce si la posicion pasada como parametro coincide con la posicion
-%% inicial del camino (es decir no es un camino parcial) y la longitud pasada como parametro
-%% no estaba definida o es menor que la anterior.
+%% simplemente verifica que no se utilicen mas piezas de las disponibles recursionando sobre las piezas utilizadas
+%% en la solucion, aprovechando que por tamaño tenemos la cantidad de piezas asociadas. Como se dijo, se asume que
+%% todas las piezas del mismo tamaño T estan consideradas en una sola CANT en pieza(T,CANT).
+%% Luego, una vez que se encuentra la pieza tamaño T en las piezas disponibles, si se utilizan a los sumo tantas piezas
+%% como se disponga, se hace un cut para eliminar ramas que ya no interesan.
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
-%%%%%%%%%%%%%%%%%%%%%%%% 
-%% ?- tablero(3,3,T), ocupar(pos(0,1),T), camino3(pos(0,0),pos(0,2),T,C).
-%% C = [pos(0, 0), pos(1, 0), pos(1, 1), pos(1, 2), pos(0, 2)] ;
-%% false.
+%%%%%%%%%%%%%%%%%%%%%%%%
+%% ejemploCumpleLimite1 :- nPiezasDeCada(2,[3,1,2],P), cumpleLimite(P,[3,2]).
+%%
+%% Resultado:
+%% True
+%%
+%% ejemploCumpleLimite2 :- nPiezasDeCada(2,[3,1,2],P), cumpleLimite(P,[1,1,1,1,1]).
+%%
+%% Resultado:
+%% False
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 %%% Ejercicio 6
@@ -196,27 +191,22 @@ construir1(T,P,SOL):- generar(T,P,SOL), cumpleLimite(P,SOL).
 %%%%%%%%%%%%%%%%%%%%%%%% 
 %% Detalle
 %%%%%%%%%%%%%%%%%%%%%%%%
-%% Para realizar camino3 se tomo como base camino2. Se hace uso de dos predicados dinamicos.
-%% Para tener de forma dinamica la logitud del camino mas chico encontrado en cada momento 
-%% se utiliza el predicado 'caminoMinimo' que solo tiene un parametro y ese valor.
-%% Para realizar el calculo de la distancia de cada camino, es necesario el punto de inicio
-%% y este se define en el predicado 'posInicial'. Se opto por este predicado para no pasar
-%% mas parametros en otros predicados.
-%% Para lograr una reduccion drastica del espacio de busqueda se utiliza el predicado 'evalRec'
-%% que compara la longitud del camino parcial encontrado con la longitud del camino mas corto.
-%% En caso de ser mayor el camino parcial, este predicado falla reduciendo el espacio de busqueda.
-%% En caso que aun no se haya encontrado el primer camino y por ende no este definido 'caminoMinimo',
-%% se continua con la busqueda.
-%% Finalmente, cuando se encuentra un camino se actualiza la distancia del mejor camino segun
-%% corresponda utilizando el predicado 'actualizaCamMin'.
-%% La actualizacion solo se produce si la posicion pasada como parametro coincide con la posicion
-%% inicial del camino (es decir no es un camino parcial) y la longitud pasada como parametro
-%% no estaba definida o es menor que la anterior.
+%% sin demasiado detalle, construir1 al mejor estilo generate&test genera todas las posibles soluciones con los
+%% tamaños que disponemos y luego checkea por cada solucion que cumpla con la disponibilidad.
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
 %%%%%%%%%%%%%%%%%%%%%%%% 
-%% ?- tablero(3,3,T), ocupar(pos(0,1),T), camino3(pos(0,0),pos(0,2),T,C).
-%% C = [pos(0, 0), pos(1, 0), pos(1, 1), pos(1, 2), pos(0, 2)] ;
+%% ejemploConstruir1(SOL) :- nPiezasDeCada(2,[3,1,2],P), construir1(5,P,SOL).
+%%
+%% Resultado:
+%% SOL = [3, 1, 1] ;
+%% SOL = [3, 2] ;
+%% SOL = [1, 3, 1] ;
+%% SOL = [1, 1, 3] ;
+%% SOL = [1, 2, 2] ;
+%% SOL = [2, 3] ;
+%% SOL = [2, 1, 2] ;
+%% SOL = [2, 2, 1] ;
 %% false.
 %%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -247,28 +237,14 @@ dameMaxAux([X|REV],K,L):- X>K, dameMaxAux(REV,K,L).
 %%%%%%%%%%%%%%%%%%%%%%%% 
 %% Detalle
 %%%%%%%%%%%%%%%%%%%%%%%%
-%% Para realizar camino3 se tomo como base camino2. Se hace uso de dos predicados dinamicos.
-%% Para tener de forma dinamica la logitud del camino mas chico encontrado en cada momento 
-%% se utiliza el predicado 'caminoMinimo' que solo tiene un parametro y ese valor.
-%% Para realizar el calculo de la distancia de cada camino, es necesario el punto de inicio
-%% y este se define en el predicado 'posInicial'. Se opto por este predicado para no pasar
-%% mas parametros en otros predicados.
-%% Para lograr una reduccion drastica del espacio de busqueda se utiliza el predicado 'evalRec'
-%% que compara la longitud del camino parcial encontrado con la longitud del camino mas corto.
-%% En caso de ser mayor el camino parcial, este predicado falla reduciendo el espacio de busqueda.
-%% En caso que aun no se haya encontrado el primer camino y por ende no este definido 'caminoMinimo',
-%% se continua con la busqueda.
-%% Finalmente, cuando se encuentra un camino se actualiza la distancia del mejor camino segun
-%% corresponda utilizando el predicado 'actualizaCamMin'.
-%% La actualizacion solo se produce si la posicion pasada como parametro coincide con la posicion
-%% inicial del camino (es decir no es un camino parcial) y la longitud pasada como parametro
-%% no estaba definida o es menor que la anterior.
+%% En esta solucion alternativa para construir, se desglosa el generar2 en tres casos:
+%% - la solucion ya existe en la base de conocimientos
+%% - la solucion utiliza una pieza de a lo sumo tamaño K, a izquierda las piezas son mas chicas
+%% - la solucion no utiliza una pieza de tamaño a lo sumo K y por ende se recursiona con K-1
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
 %%%%%%%%%%%%%%%%%%%%%%%% 
-%% ?- tablero(3,3,T), ocupar(pos(0,1),T), camino3(pos(0,0),pos(0,2),T,C).
-%% C = [pos(0, 0), pos(1, 0), pos(1, 1), pos(1, 2), pos(0, 2)] ;
-%% false.
+%% 
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 % ####################################
@@ -285,27 +261,13 @@ todosConstruir1(T,P,SOL,N):- aggregate_all(count,construir1(T,P,SOL),N).
 %%%%%%%%%%%%%%%%%%%%%%%% 
 %% Detalle
 %%%%%%%%%%%%%%%%%%%%%%%%
-%% Para realizar camino3 se tomo como base camino2. Se hace uso de dos predicados dinamicos.
-%% Para tener de forma dinamica la logitud del camino mas chico encontrado en cada momento 
-%% se utiliza el predicado 'caminoMinimo' que solo tiene un parametro y ese valor.
-%% Para realizar el calculo de la distancia de cada camino, es necesario el punto de inicio
-%% y este se define en el predicado 'posInicial'. Se opto por este predicado para no pasar
-%% mas parametros en otros predicados.
-%% Para lograr una reduccion drastica del espacio de busqueda se utiliza el predicado 'evalRec'
-%% que compara la longitud del camino parcial encontrado con la longitud del camino mas corto.
-%% En caso de ser mayor el camino parcial, este predicado falla reduciendo el espacio de busqueda.
-%% En caso que aun no se haya encontrado el primer camino y por ende no este definido 'caminoMinimo',
-%% se continua con la busqueda.
-%% Finalmente, cuando se encuentra un camino se actualiza la distancia del mejor camino segun
-%% corresponda utilizando el predicado 'actualizaCamMin'.
-%% La actualizacion solo se produce si la posicion pasada como parametro coincide con la posicion
-%% inicial del camino (es decir no es un camino parcial) y la longitud pasada como parametro
-%% no estaba definida o es menor que la anterior.
+%% utiliza el predicado aggregate_all para contar las soluciones de construir1 de tamaño T en N
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
 %%%%%%%%%%%%%%%%%%%%%%%% 
-%% ?- tablero(3,3,T), ocupar(pos(0,1),T), camino3(pos(0,0),pos(0,2),T,C).
-%% C = [pos(0, 0), pos(1, 0), pos(1, 1), pos(1, 2), pos(0, 2)] ;
+%% ejemploTodosConstruir1(N) :- nPiezasDeCada(2,[3,1,2],P), todosConstruir1(5,P,_,N).
+%% Resultado:
+%% N = 8 ;
 %% false.
 %%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -314,32 +276,18 @@ todosConstruir1(T,P,SOL,N):- aggregate_all(count,construir1(T,P,SOL),N).
 % todosConstruir2(+Total, +Piezas, -Soluciones, -N), donde Soluciones representa una lista con todas 
 %  las soluciones de longitud Total obtenidas con construir2/3, y N indica la cantidad de soluciones totales.
 
-todosConstruir2(T,P,SOL,N):- aggregate_all(count,todosConstruir2(T,P,SOL),N). 
+todosConstruir2(T,P,SOL,N):- aggregate_all(count,construir2(T,P,SOL),N). 
 
 %%%%%%%%%%%%%%%%%%%%%%%% 
 %% Detalle
 %%%%%%%%%%%%%%%%%%%%%%%%
-%% Para realizar camino3 se tomo como base camino2. Se hace uso de dos predicados dinamicos.
-%% Para tener de forma dinamica la logitud del camino mas chico encontrado en cada momento 
-%% se utiliza el predicado 'caminoMinimo' que solo tiene un parametro y ese valor.
-%% Para realizar el calculo de la distancia de cada camino, es necesario el punto de inicio
-%% y este se define en el predicado 'posInicial'. Se opto por este predicado para no pasar
-%% mas parametros en otros predicados.
-%% Para lograr una reduccion drastica del espacio de busqueda se utiliza el predicado 'evalRec'
-%% que compara la longitud del camino parcial encontrado con la longitud del camino mas corto.
-%% En caso de ser mayor el camino parcial, este predicado falla reduciendo el espacio de busqueda.
-%% En caso que aun no se haya encontrado el primer camino y por ende no este definido 'caminoMinimo',
-%% se continua con la busqueda.
-%% Finalmente, cuando se encuentra un camino se actualiza la distancia del mejor camino segun
-%% corresponda utilizando el predicado 'actualizaCamMin'.
-%% La actualizacion solo se produce si la posicion pasada como parametro coincide con la posicion
-%% inicial del camino (es decir no es un camino parcial) y la longitud pasada como parametro
-%% no estaba definida o es menor que la anterior.
+%% utiliza el predicado aggregate_all para contar las soluciones de construir2 de tamaño T en N 
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
 %%%%%%%%%%%%%%%%%%%%%%%% 
-%% ?- tablero(3,3,T), ocupar(pos(0,1),T), camino3(pos(0,0),pos(0,2),T,C).
-%% C = [pos(0, 0), pos(1, 0), pos(1, 1), pos(1, 2), pos(0, 2)] ;
+%% ejemploTodosConstruir2(N) :- nPiezasDeCada(2,[3,1,2],P), todosConstruir2(5,P,_,N).
+%% Resultado:
+%% N = 8 ;
 %% false.
 %%%%%%%%%%%%%%%%%%%%%%%%
 
