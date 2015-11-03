@@ -233,10 +233,9 @@ construir1(T,P,SOL):- generar(T,P,SOL), cumpleLimite(P,SOL).
 construir2(T,P,SOL):- retractall(lookUp(_,_,_,_)), generar2(T,P,T,SOL), cumpleLimite(P,SOL).
 
 generar2(0,_,_,[]).
-generar2(T,P,K,SOL):- T>0, lookUp(T,P,K,SOL), !.
-generar2(T,P,K,SOL):- T>0, K>0, L is K-1, generar2(T,P,L,SOL), assert(lookUp(T,P,K,SOL)).
-generar2(T,P,K,SOL):- T>0, dameMax(P,K,L), M is T-L, between(0,M,T1), T2 is T-L-T1, L2 is L-1, generar2(T1,P,L2,SOL1), generar2(T2,P,L,SOL2), append(SOL1, [K|SOL2], SOL), assert(lookUp(T,P,K,SOL)).
-
+generar2(T,P,K,SOL):- T>0, lookUp(T,P,K,SOL).
+generar2(T,P,K,SOL):- T>0, K>0, L is K-1, generar2(T,P,L,SOL), not(lookUp(T,P,K,SOL)), assert(lookUp(T,P,K,SOL)).
+generar2(T,P,K,SOL):- T>0, dameMax(P,K,L), M is T-L, between(0,M,T1), T2 is T-L-T1, L2 is L-1, generar2(T1,P,L2,SOL1), generar2(T2,P,L,SOL2), append(SOL1, [K|SOL2], SOL), not(lookUp(T,P,K,SOL)), assert(lookUp(T,P,K,SOL)).
 
 :- dynamic lookUp/4.
 
@@ -481,11 +480,11 @@ ejemploTodosConstruir2(N) :- nPiezasDeCada(2,[3,1,2],P), todosConstruir2(5,P,_,N
 % N = 8 ;
 % false.
 
-ejemploTimeConstruir1 :- time(ejemploConstruir1(_)).
+ejemploTimeConstruir1 :- time(construir1(5,[pieza(3,2),pieza(1,2),pieza(2,2)],_)).
 
 % Resultado: FALTA!
 
-ejemploTimeConstruir2 :- time(ejemploConstruir2(_)).
+ejemploTimeConstruir2 :- time(construir2(5,[pieza(3,2),pieza(1,2),pieza(2,2)],_)).
 
 % Resultado: FALTA!
 
