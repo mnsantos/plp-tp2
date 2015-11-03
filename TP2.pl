@@ -301,20 +301,16 @@ todosConstruir2(T,P,SOL,N):- aggregate_all(count,construir2(T,P,SOL),N).
 %  en los términos definidos anteriormente y, además, sus piezas respeten el patrón indicado en Patrón. 
 %  Se sugiere definir un predicado tienePatrón(+Lista, ?Patrón) que decida si Lista presenta el Patrón especificado.
 
-construirConPatron(T,P,PATRON,SOL):- construir1(T,P,SOL), tienePatron(SOL,PATRON). 
+construirConPatron(T,P,PATRON,SOL):- construir1(T,P,SOL), tienePatron(PATRON,SOL). 
 
-% tienePatron(+Lista,?Patron). La idea es guardar el patron en caso de que la lista tenga mayor longitud.
+% tienePatron(+Lista,?Patron).
 
-tienePatron(LISTA,PATRON) :- tienePatronAux(PATRON,PATRON,LISTA).
+tienePatron(PATRON,LISTA) :- tienePatronAux(PATRON,PATRON,LISTA).
 
-% tienePatronAux(?Patron,?Patron,+Lista). La idea es consumir el patron y la lista en simultaneo.
-% Si el elemento del patron esta instanciado entonces hay que verificar que coincida con el elemento
-% de la lista. Caso contrario se unifica el elemento del patron con el elemento de la lista.
-% Si la lista con el patron fue consumida pero la lista no se encuentra vacia entonces volvemos a comenzar
-% con lo que queda de patron.
+% tienePatronAux(?Patron,?Patron,+Lista). 
  
 tienePatronAux(_,[],[]).
-tienePatronAux(PATRON,[],LISTA) :- tienePatronAux(PATRON,PATRON,LISTA).
+tienePatronAux([P|PS],[],[L|LS]) :- tienePatronAux([P|PS],[P|PS],[L|LS]).
 tienePatronAux(PATRON,[P|PS],[X|XS]):- tienePatronAux(PATRON,PS,XS), asignarOChequear(P,X).
 
 % asignarOChequear(?P,+X). Unifica X con P si P no esta instanciada. Compara X con P si
@@ -326,28 +322,21 @@ asignarOChequear(P,X):- not(var(P)), X==P.
 %%%%%%%%%%%%%%%%%%%%%%%% 
 %% Detalle
 %%%%%%%%%%%%%%%%%%%%%%%%
-%% Para realizar camino3 se tomo como base camino2. Se hace uso de dos predicados dinamicos.
-%% Para tener de forma dinamica la logitud del camino mas chico encontrado en cada momento 
-%% se utiliza el predicado 'caminoMinimo' que solo tiene un parametro y ese valor.
-%% Para realizar el calculo de la distancia de cada camino, es necesario el punto de inicio
-%% y este se define en el predicado 'posInicial'. Se opto por este predicado para no pasar
-%% mas parametros en otros predicados.
-%% Para lograr una reduccion drastica del espacio de busqueda se utiliza el predicado 'evalRec'
-%% que compara la longitud del camino parcial encontrado con la longitud del camino mas corto.
-%% En caso de ser mayor el camino parcial, este predicado falla reduciendo el espacio de busqueda.
-%% En caso que aun no se haya encontrado el primer camino y por ende no este definido 'caminoMinimo',
-%% se continua con la busqueda.
-%% Finalmente, cuando se encuentra un camino se actualiza la distancia del mejor camino segun
-%% corresponda utilizando el predicado 'actualizaCamMin'.
-%% La actualizacion solo se produce si la posicion pasada como parametro coincide con la posicion
-%% inicial del camino (es decir no es un camino parcial) y la longitud pasada como parametro
-%% no estaba definida o es menor que la anterior.
+%% La idea es consumir el patron y la lista en simultaneo.
+%% Si el elemento actual del patron esta instanciado entonces hay que verificar que sea igual al elemento
+%% actual de la lista. Caso contrario se unifica el elemento del patron con el elemento de la lista.
+%% Si el patron fue totalmente consumido pero la lista no se encuentra vacia entonces volvemos a comenzar
+%% con lo que queda de patron.
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
 %%%%%%%%%%%%%%%%%%%%%%%% 
-%% ?- tablero(3,3,T), ocupar(pos(0,1),T), camino3(pos(0,0),pos(0,2),T,C).
-%% C = [pos(0, 0), pos(1, 0), pos(1, 1), pos(1, 2), pos(0, 2)] ;
-%% false.
+%% ?- ejemploConstruirConPatron([A,B],SOL).
+%% A = 3,
+%% B = 2,
+%% SOL = [3, 2] ;
+%% A = 2,
+%% B = 3,
+%% SOL = [2, 3] ;
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%
@@ -435,4 +424,6 @@ ejemploTimeConstruir1 :- time(construir1(5,[pieza(3,2),pieza(1,2),pieza(2,2)],_)
 ejemploTimeConstruir2 :- time(construir2(5,[pieza(3,2),pieza(1,2),pieza(2,2)],_)).
 
 % Resultado: FALTA!
+
+ejemploConstruirConPatron(PAT,SOL) :- construirConPatron(5, [pieza(3,2),pieza(1,2),pieza(2,2)], PAT, SOL).
 
