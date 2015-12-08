@@ -7,7 +7,7 @@
 % listaNats(+LInf,+LSup,?Nats), que unifica la lista Nats con los naturales en el rango [LInf, LSup], o una lista vacía si LSup < LInf.
 
 listaNats(INF,SUP,LNATS):- SUP<INF, LNATS=[]. 
-listaNats(INF,SUP,LNATS):- SUP>=INF, LNATS=[INF|B], INF2 is INF+1, listaNats(INF2,SUP,B).
+listaNats(INF,SUP,[INF|B]):- SUP>=INF, INF2 is INF+1, listaNats(INF2,SUP,B).
 
 %%%%%%%%%%%%%%%%%%%%%%%% 
 %% Detalle
@@ -33,7 +33,7 @@ listaNats(INF,SUP,LNATS):- SUP>=INF, LNATS=[INF|B], INF2 is INF+1, listaNats(INF
 	
 nPiezasDeCada(0,_,[]).
 nPiezasDeCada(_,[],[]).
-nPiezasDeCada(CANT,[T|TAMS],PIEZAS):- PIEZAS=[pieza(T,CANT)|P], nPiezasDeCada(CANT,TAMS,P). 
+nPiezasDeCada(CANT,[T|TAMS],[pieza(T,CANT)|P]):- nPiezasDeCada(CANT,TAMS,P). 
 
 %%%%%%%%%%%%%%%%%%%%%%%% 
 %% Detalle
@@ -52,27 +52,20 @@ nPiezasDeCada(CANT,[T|TAMS],PIEZAS):- PIEZAS=[pieza(T,CANT)|P], nPiezasDeCada(CA
 % resumenPiezas(+SecPiezas, -Piezas), que permite instanciar Piezas con la lista de
 %  piezas incluidas en SecPiezas. 
 
+
 resumenPiezas([],[]).
-resumenPiezas(SECP,PIEZAS):- msort(SECP,SECORD), nPiezasDeCada(1,SECORD,P), juntar(P,PIEZAS).
+resumenPiezas([S|SS],[pieza(S,CANT)|PS]):- count([S|SS],S,CANT), delete(SS,S,L), resumenPiezas(L,PS).
 
-% juntar(+PiezasOrdenadas,-PiezasJuntadas), funcion que dada una lista de piezas ordenadas en tamaño retorna 
-% una nueva lista de piezas pero juntando aquellas que tienen el mismo tamaño, de manera que se crea una nueva 
-% pieza con el tamaño original cuya cantidad es la suma de las cantidades de las piezas originales.
-
-juntar([],[]).
-juntar([X],[X]).
-juntar([pieza(T1,C1),pieza(T2,C2)|PS],PIEZAS):- T1=\=T2, juntar([pieza(T2,C2)|PS],P), PIEZAS=[pieza(T1,C1)|P].
-juntar([pieza(T,C1),pieza(T,C2)|PS],PIEZAS):- C3 is C1+C2, juntar([pieza(T,C3)|PS],PIEZAS).
+count([],_,0).
+count([X|T],X,Y):- count(T,X,Z), Y is 1+Z.
+count([Y|T],X,Z):- Y\=X,count(T,X,Z).
 
 %%%%%%%%%%%%%%%%%%%%%%%% 
 %% Detalle
 %%%%%%%%%%%%%%%%%%%%%%%%
-%% resumenPiezas ordena la secuencia de Naturales SecPiezas, aun con repetidos. Teniendo esta secuencia 
-%% ordenada crea una pieza con cada tamaño y luego junta piezas de igual tamaño. Es necesario ordenar pues
-%% juntar tiene como precondicion que las piezas le lleguen ordenadas por tamaño.
 %%
-%% juntar recursiona sobre la secuencia de piezas ordenadas, tomando de a pares en cada paso recursivo y 
-%% sumando cantidades si los tamaños son iguales.
+%%
+%%
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
 %%%%%%%%%%%%%%%%%%%%%%%% 
@@ -91,13 +84,7 @@ juntar([pieza(T,C1),pieza(T,C2)|PS],PIEZAS):- C3 is C1+C2, juntar([pieza(T,C3)|P
 %  esté acorde con la disponibilidad.
 
 generar(0,_,[]).
-generar(T,PIEZAS,SOL):- T>0, tamanios(PIEZAS,TP), member(TAM,TP), T1 is T-TAM, generar(T1,PIEZAS,SOL1), SOL=[TAM|SOL1].
-
-% tamanios(+Piezas,-Tamanios), funcion que dada una lista de piezas retorna una lista con los Tamaños
-% de cada pieza.
-
-tamanios([],[]).
-tamanios([pieza(T,_)|L],LNATS):- tamanios(L,D), LNATS=[T|D]. 
+generar(T,PIEZAS,[TAM|SOL1]):- T>0, member(pieza(TAM,_),PIEZAS), T1 is T-TAM, generar(T1,PIEZAS,SOL1).
 
 %%%%%%%%%%%%%%%%%%%%%%%% 
 %% Detalle
@@ -220,20 +207,25 @@ construir1(T,P,SOL):- generar(T,P,SOL), cumpleLimite(P,SOL).
 %  definiciones dinámicas para persistir los cálculos auxiliares realizados y evitar repetirlos. 
 %  No se espera que las soluciones aparezcan en el mismo orden entre construir1/3 y construir2/3, pero sí, sean las mismas.
 
-construir2(T,P,SOL):- retractall(lookUp(_,_,_,_)), generar2(T,P,T,SOL), cumpleLimite(P,SOL).
+construir2(T,P,SOL):- retractall(lookUp(_,_,_)), generar2(T,P,T,SOL), cumpleLimite(P,SOL).
 
 generar2(0,_,_,[]).
-generar2(T,P,K,SOL):- T>0, lookUp(T,P,K,SOL).
-generar2(T,P,K,SOL):- T>0, K>0, L is K-1, generar2(T,P,L,SOL), not(lookUp(T,P,K,SOL)), assert(lookUp(T,P,K,SOL)).
-generar2(T,P,K,SOL):- T>0, dameMax(P,K,L), M is T-L, between(0,M,T1), T2 is T-L-T1, L2 is L-1, generar2(T1,P,L2,SOL1),
-					 generar2(T2,P,L,SOL2), append(SOL1, [K|SOL2], SOL), not(lookUp(T,P,K,SOL)), assert(lookUp(T,P,K,SOL)).
+generar2(T,_,K,SOL):- T>0, lookUp(T,K,SOL).
+generar2(T,P,K,SOL):- T>0, K>0, L is K-1, not(lookUp(T,K,SOL)), generar2(T,P,L,SOL), assert(lookUp(T,K,SOL)).
+generar2(T,P,K,SOL):- T>0, max(P,K,L), M is T-L, between(0,M,T1), T2 is T-L-T1, L2 is L-1, not(lookUp(T,K,SOL)),
+					 generar2(T1,P,L2,SOL1), generar2(T2,P,L,SOL2), append(SOL1,[L|SOL2],SOL), assert(lookUp(T,K,SOL)).
 
-:- dynamic lookUp/4.
+:- dynamic lookUp/3.
 
-dameMax(P,K,L):- tamanios(P,TS), sort(TS,TSORD), reverse(TSORD, REV), dameMaxAux(REV,K,L).
+max([pieza(T,_)],K,T):- T =< K, !.
+max([pieza(T,_)|Xs],K,T):- max(Xs,K,T2), T >= T2, T =< K.
+max([pieza(T,_)|Xs],K,T):- not(max(Xs,K,_)), T =< K.
+max([pieza(T,_)|Xs],K,T2):- max(Xs,K,T2), T2 > T.
 
-dameMaxAux([X|_],K,L):- X=<K, L=X, !. 
-dameMaxAux([X|REV],K,L):- X>K, dameMaxAux(REV,K,L).
+%% dameMax(P,K,L):- tamanios(P,TS), sort(TS,TSORD), reverse(TSORD, REV), dameMaxAux(REV,K,L).
+
+%% dameMaxAux([X|_],K,L):- X=<K, L=X, !. 
+%% dameMaxAux([X|REV],K,L):- X>K, dameMaxAux(REV,K,L).
 
 %%%%%%%%%%%%%%%%%%%%%%%% 
 %% Detalle
@@ -280,7 +272,7 @@ dameMaxAux([X|REV],K,L):- X>K, dameMaxAux(REV,K,L).
 % todosConstruir1(+Total, +Piezas, -Soluciones, -N), donde Soluciones representa una lista con todas las
 %  soluciones de longitud Total obtenidas con construir1/3, y N indica la cantidad de soluciones totales.
 
-todosConstruir1(T,P,SOL,N):- aggregate_all(count,construir1(T,P,SOL),N). 
+todosConstruir1(T,P,SOL,N):- findall(S,construir1(T,P,S),SOL), length(SOL,N). 
 
 %%%%%%%%%%%%%%%%%%%%%%%% 
 %% Detalle
@@ -300,7 +292,7 @@ todosConstruir1(T,P,SOL,N):- aggregate_all(count,construir1(T,P,SOL),N).
 % todosConstruir2(+Total, +Piezas, -Soluciones, -N), donde Soluciones representa una lista con todas 
 %  las soluciones de longitud Total obtenidas con construir2/3, y N indica la cantidad de soluciones totales.
 
-todosConstruir2(T,P,SOL,N):- aggregate_all(count,construir2(T,P,SOL),N). 
+todosConstruir2(T,P,SOL,N):- findall(S,construir2(T,P,S),SOL), length(SOL,N). 
 
 %%%%%%%%%%%%%%%%%%%%%%%% 
 %% Detalle
@@ -369,7 +361,7 @@ asignarOChequear(P,X):- not(var(P)), X==P.
 
 ejemploListaDeNats1(P) :- listaNats( 1, 20, D), nPiezasDeCada( 5, D, P).
 ejemploListaDeNats2(P) :- listaNats( 1, 3, D_1_3), nPiezasDeCada( 2, D_1_3, P_1_3),
-					listaNats( 4, 6, D_4_6), nPiezasDeCada( 5, D_4_6, P_4_6), append(P_1_3, P_4_6, P).
+						  listaNats( 4, 6, D_4_6), nPiezasDeCada( 5, D_4_6, P_4_6), append(P_1_3, P_4_6, P).
 
 % Resultado:
 % P = [pieza(3, 2), pieza(1, 2), pieza(2, 2)] 
