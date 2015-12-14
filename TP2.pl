@@ -208,19 +208,19 @@ construir1(T,P,SOL):- generar(T,P,SOL), cumpleLimite(P,SOL).
 %  No se espera que las soluciones aparezcan en el mismo orden entre construir1/3 y construir2/3, pero sí, sean las mismas.
 
 
-construir2(T,P,SOL):- retractall(calculado(_,_,_)), retractall(devolver_de_cache(_,_,_)), predsort(compareP, P, PSORT),
+construir2(T,P,SOL):- retractall(devolver_de_cache(_,_,_)), predsort(compareP, P, PSORT),
                     nextMax(PSORT,T,M), resolver_con_cache(T,PSORT,M,SOL), cumpleLimite(P,SOL).
 
-resolver_con_cache(T,_,K,SOL) :- calculado(T,K,SOL), devolver_de_cache(T,K,SOL).
-resolver_con_cache(T,P,K,SOL) :- not(calculado(T,K,SOL)), generar2(T,P,K,SOL), anotar_en_cache(T,K,SOL).
+resolver_con_cache(T,_,K,SOL) :- devolver_de_cache(T,K,SOL).
+resolver_con_cache(T,P,K,SOL) :- not(devolver_de_cache(T,K,SOL)), generar2(T,P,K,SOL), cumpleLimite(P,SOL), anotar_en_cache(T,K,SOL).
 
 generar2(0,_,_,[]).
 generar2(T,P,K,SOL):- T>0, K>0, L is K-1, nextMax(P,L,M), resolver_con_cache(T,P,M,SOL).
+generar2(T,P,K,SOL):- T>0, K>0, L is K-1, not(nextMax(P,L,_)), T1 is T-K, resolver_con_cache(T1,P,K,SOL1), SOL=[K|SOL1].
 generar2(T,P,K,SOL):- T>0, K>0, L is K-1, nextMax(P,L,M1), M is T-K, between(0,M,T1), T2 is T-K-T1,
                     resolver_con_cache(T1,P,M1,SOL1), resolver_con_cache(T2,P,K,SOL2), append(SOL1,[K|SOL2],SOL).
-generar2(T,P,K,SOL):- T>0, K>0, L is K-1, not(nextMax(P,L,_)), T1 is T-K, resolver_con_cache(T1,P,K,SOL1), SOL=[K|SOL1].
 
-anotar_en_cache(T,K,SOL):- assert(calculado(T,K,SOL)), assert(devolver_de_cache(T,K,SOL)).
+anotar_en_cache(T,K,SOL):- assert(devolver_de_cache(T,K,SOL)).
 
 compareP(>, pieza(T1,_),pieza(T2,_)):- T2>T1.
 compareP(<, pieza(T1,_),pieza(T2,_)):- T2<T1.
@@ -229,34 +229,7 @@ compareP(=, pieza(T1,_),pieza(T2,_)):- T1=T2.
 nextMax([pieza(T,_)|_],K,T):- T =< K.
 nextMax([pieza(T,_)|Xs],K,T1):- T>K, nextMax(Xs,K,T1).
 
-:- dynamic calculado/3.
-
 :- dynamic devolver_de_cache/3.
-
-%% construir2(T,P,SOL):- retractall(lookUp(_,_,_)), predsort(compareP, P, PSORT), nextMax(PSORT,T,M),
-%%                     generar2(T,PSORT,M,SOL), cumpleLimite(P,SOL).%, retract(lookUp(TSORT,M,SOL)).
-
-%% generar2(0,_,_,[]).
-
-%% %generar2(T,_,K,SOL):- lookUp(T,K,SOL).
-
-%% generar2(T,P,K,SOL):- T>0, K>0, L is K-1, not(nextMax(P,L,_)), T1 is T-K,
-%%                     generar2(T1,P,K,SOL1), SOL=[K|SOL1], assert(lookUp(T,K,SOL)).
-
-%% generar2(T,P,K,SOL):- T>0, K>0, L is K-1, nextMax(P,L,M),
-%%                     generar2(T,P,M,SOL), assert(lookUp(T,K,SOL)).
-
-%% generar2(T,P,K,SOL):- T>0, K>0, L is K-1, nextMax(P,L,M1), M is T-K, between(0,M,T1), T2 is T-K-T1,
-%%                     generar2(T1,P,M1,SOL1), generar2(T2,P,K,SOL2), append(SOL1,[K|SOL2],SOL), assert(lookUp(T,K,SOL)).
-
-%% compareP(>, pieza(T1,_),pieza(T2,_)):- T2>T1.
-%% compareP(<, pieza(T1,_),pieza(T2,_)):- T2<T1.
-%% compareP(=, pieza(T1,_),pieza(T2,_)):- T1=T2.
-
-%% nextMax([pieza(T,_)|_],K,T):- T =< K.
-%% nextMax([pieza(T,_)|Xs],K,T1):- T>K, nextMax(Xs,K,T1).
-
-%% :- dynamic lookUp/3.
 
 %%%%%%%%%%%%%%%%%%%%%%%% 
 %% Detalle
@@ -285,18 +258,14 @@ nextMax([pieza(T,_)|Xs],K,T1):- T>K, nextMax(Xs,K,T1).
 % Comparación de resultados y tiempos
 % ####################################
 
-% Los tiempos hallados para cada implementacion de construir son:
-%
-% ?- ejemploTimeConstruir1(T).
-% 582 inferences, 0.000 CPU in 0.000 seconds (98% CPU, 2220891 Lips)
-% T = 8.
-%
-% ?- ejemploTimeConstruir2(T).
-% 4,673 inferences, 0.001 CPU in 0.001 seconds (100% CPU, 4325238 Lips)
-% T = 8.
-%
-% Esperabamos que construir2 insumiera menos tiempo por el dinamismo y la reutilizacion de resultados
-% generados pero no fue asi. Creemos que esto se debe a un error en la implementacion.
+%% ?- ejemploTimeConstruir1(M).
+%% 1,917,723,405 inferences, 168.986 CPU in 168.846 seconds (100% CPU, 11348404 Lips)
+%% M = 34020.
+
+%% ?- ejemploTimeConstruir2(M).
+%% 94,218,288 inferences, 9.195 CPU in 9.189 seconds (100% CPU, 10246862 Lips)
+%% M = 34020.
+
 %
 %%% Ejercicio 8
 
@@ -344,7 +313,7 @@ todosConstruir2(T,P,SOL,N):- findall(S,construir2(T,P,S),SOL), length(SOL,N).
 
 %%% Ejercicio 10
 
-% construirConPatron(+Total, +Piezas, ?Patrón, -Solución) será verdadero cuando Solución sea una solución factible 
+%  construirConPatron(+Total, +Piezas, ?Patrón, -Solución) será verdadero cuando Solución sea una solución factible 
 %  en los términos definidos anteriormente y, además, sus piezas respeten el patrón indicado en Patrón. 
 %  Se sugiere definir un predicado tienePatrón(+Lista, ?Patrón) que decida si Lista presenta el Patrón especificado.
 
@@ -361,7 +330,7 @@ tienePatron(PATRON,LISTA) :- length(PATRON,N), append(L1,L2,LISTA), length(L1,N)
 %% La idea es partir la lista en dos y preguntar si cada una de las sublistas tiene patron. Si el patron y
 %% la lista tienen el mismo tamanio entonces, o bien se unifican las variables no instanciadas, o
 %% bien se chequea la coincidencia de los literales.
-%% Para partir las listas nos aseguramos de que ambas sublistas tengas tamanio mayor o igual al patron.
+%% Para partir las listas nos aseguramos de que ambas sublistas tengan tamanio mayor o igual al patron.
 %% Si no sucede esto, entonces tienePatron es falso.
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
@@ -439,7 +408,6 @@ ejemploConstruir1(SOL) :- nPiezasDeCada(2,[3,1,2],P), construir1(5,P,SOL).
 
 ejemploConstruir2(SOL) :- nPiezasDeCada(2,[3,1,2],P), construir2(5,P,SOL).
 
-% Resultado:
 % ?- ejemploConstruir2(SOL).
 % SOL = [2, 2, 1] ;
 % SOL = [2, 1, 2] ;
@@ -449,7 +417,7 @@ ejemploConstruir2(SOL) :- nPiezasDeCada(2,[3,1,2],P), construir2(5,P,SOL).
 % SOL = [1, 3, 1] ;
 % SOL = [1, 1, 3] ;
 % SOL = [2, 3] ;
-
+% false.
 
 ejemploTodosConstruir1(N) :- nPiezasDeCada(2,[3,1,2],P), todosConstruir1(5,P,_,N).
 
@@ -463,17 +431,48 @@ ejemploTodosConstruir2(N) :- nPiezasDeCada(2,[3,1,2],P), todosConstruir2(5,P,_,N
 % N = 8 ;
 % false.
 
-ejemploTimeConstruir1(T) :- time(todosConstruir1(15,[pieza(10,2),pieza(9,2),pieza(8,2),pieza(7,2),pieza(6,2),pieza(5,2),pieza(4,2),pieza(3,2),pieza(2,2),pieza(1,2)],_,T)).
+ejemploTimeConstruir1(T) :- time(todosConstruir1(25,[pieza(5,2),pieza(4,2),pieza(3,2),pieza(2,2),pieza(1,2)],_,T)).
 
-% ?- ejemploTimeConstruir1(T).
-% 582 inferences, 0.000 CPU in 0.000 seconds (98% CPU, 2220891 Lips)
-% T = 8.
+%% ?- ejemploTimeConstruir1(M).
+%% 1,917,723,405 inferences, 168.986 CPU in 168.846 seconds (100% CPU, 11348404 Lips)
+%% M = 34020.
 
-ejemploTimeConstruir2(T) :- time(todosConstruir2(15,[pieza(10,2),pieza(9,2),pieza(8,2),pieza(7,2),pieza(6,2),pieza(5,2),pieza(4,2),pieza(3,2),pieza(2,2),pieza(1,2)],_,T)).
+ejemploTimeConstruir2(T) :- time(todosConstruir2(25,[pieza(5,2),pieza(4,2),pieza(3,2),pieza(2,2),pieza(1,2)],_,T)).
 
-% ?- ejemploTimeConstruir2(T).
-% 4,673 inferences, 0.001 CPU in 0.001 seconds (100% CPU, 4325238 Lips)
-% T = 8.
+%% ?- ejemploTimeConstruir2(M).
+%% 94,218,288 inferences, 9.195 CPU in 9.189 seconds (100% CPU, 10246862 Lips)
+%% M = 34020.
 
 ejemploConstruirConPatron(PAT,SOL) :- construirConPatron(5, [pieza(3,2),pieza(1,2),pieza(2,2)], PAT, SOL).
+
+ejemploTienePatron1(A):- tienePatron([A, A], [1,1,1,1]).
+
+% ?- ejemploTienePatron1(A).
+% A = 1 ;
+% false.
+
+ejemploTienePatron2(B):- tienePatron([B, B], [1,1,1]).
+
+% ?- ejemploTienePatron2(B).
+% false.
+
+ejemploTienePatron3(A, B):- tienePatron([A, B], [2,1,2,1]).
+
+% ?- ejemploTienePatron3(A,B).
+% A = 2,
+% B = 1 ;
+% false.
+
+ejemploTienePatron4(A, B):- tienePatron([A, B], [2,1,4,5]).
+
+% ?- ejemploTienePatron4(A,B).
+% false.
+
+ejemploTienePatron5(A, B, C):- tienePatron([A, 1, B, 2, C], [2,1,3,2,7]).
+
+% ?- ejemploTienePatron5(A,B,C).
+% A = 2,
+% B = 3,
+% C = 7 ;
+% false.
 
