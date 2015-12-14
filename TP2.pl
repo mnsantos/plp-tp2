@@ -30,7 +30,7 @@ listaNats(INF,SUP,[INF|B]):- SUP>=INF, INF2 is INF+1, listaNats(INF2,SUP,B).
 
 % nPiezasDeCada(+Cant, +Tamaños, -Piezas), que instancia a Piezas con una lista que contiene 
 %  una cantidad Cant de cada tamaño en la lista Tamaños.
-	
+    
 nPiezasDeCada(0,_,[]).
 nPiezasDeCada(_,[],[]).
 nPiezasDeCada(CANT,[T|TAMS],[pieza(T,CANT)|P]):- nPiezasDeCada(CANT,TAMS,P). 
@@ -84,7 +84,7 @@ count([Y|T],X,Z):- Y\=X,count(T,X,Z).
 %  esté acorde con la disponibilidad.
 
 generar(0,_,[]).
-generar(T,PIEZAS,[TAM|SOL1]):- T>0, member(pieza(TAM,_),PIEZAS), T1 is T-TAM, generar(T1,PIEZAS,SOL1).
+generar(T,PIEZAS,[TAM|SOL]):- T>0, member(pieza(TAM,_),PIEZAS), T1 is T-TAM, generar(T1,PIEZAS,SOL).
 
 %%%%%%%%%%%%%%%%%%%%%%%% 
 %% Detalle
@@ -207,25 +207,56 @@ construir1(T,P,SOL):- generar(T,P,SOL), cumpleLimite(P,SOL).
 %  definiciones dinámicas para persistir los cálculos auxiliares realizados y evitar repetirlos. 
 %  No se espera que las soluciones aparezcan en el mismo orden entre construir1/3 y construir2/3, pero sí, sean las mismas.
 
-construir2(T,P,SOL):- retractall(lookUp(_,_,_)), generar2(T,P,T,SOL), cumpleLimite(P,SOL).
+
+construir2(T,P,SOL):- retractall(calculado(_,_,_)), retractall(devolver_de_cache(_,_,_)), predsort(compareP, P, PSORT),
+                    nextMax(PSORT,T,M), resolver_con_cache(T,PSORT,M,SOL), cumpleLimite(P,SOL).
+
+resolver_con_cache(T,_,K,SOL) :- calculado(T,K,SOL), devolver_de_cache(T,K,SOL).
+resolver_con_cache(T,P,K,SOL) :- not(calculado(T,K,SOL)), generar2(T,P,K,SOL), anotar_en_cache(T,K,SOL).
 
 generar2(0,_,_,[]).
-generar2(T,_,K,SOL):- T>0, lookUp(T,K,SOL).
-generar2(T,P,K,SOL):- T>0, K>0, L is K-1, not(lookUp(T,K,SOL)), generar2(T,P,L,SOL), assert(lookUp(T,K,SOL)).
-generar2(T,P,K,SOL):- T>0, max(P,K,L), M is T-L, between(0,M,T1), T2 is T-L-T1, L2 is L-1, not(lookUp(T,K,SOL)),
-					 generar2(T1,P,L2,SOL1), generar2(T2,P,L,SOL2), append(SOL1,[L|SOL2],SOL), assert(lookUp(T,K,SOL)).
+generar2(T,P,K,SOL):- T>0, K>0, L is K-1, nextMax(P,L,M), resolver_con_cache(T,P,M,SOL).
+generar2(T,P,K,SOL):- T>0, K>0, L is K-1, nextMax(P,L,M1), M is T-K, between(0,M,T1), T2 is T-K-T1,
+                    resolver_con_cache(T1,P,M1,SOL1), resolver_con_cache(T2,P,K,SOL2), append(SOL1,[K|SOL2],SOL).
+generar2(T,P,K,SOL):- T>0, K>0, L is K-1, not(nextMax(P,L,_)), T1 is T-K, resolver_con_cache(T1,P,K,SOL1), SOL=[K|SOL1].
 
-:- dynamic lookUp/3.
+anotar_en_cache(T,K,SOL):- assert(calculado(T,K,SOL)), assert(devolver_de_cache(T,K,SOL)).
 
-max([pieza(T,_)],K,T):- T =< K, !.
-max([pieza(T,_)|Xs],K,T):- max(Xs,K,T2), T >= T2, T =< K.
-max([pieza(T,_)|Xs],K,T):- not(max(Xs,K,_)), T =< K.
-max([pieza(T,_)|Xs],K,T2):- max(Xs,K,T2), T2 > T.
+compareP(>, pieza(T1,_),pieza(T2,_)):- T2>T1.
+compareP(<, pieza(T1,_),pieza(T2,_)):- T2<T1.
+compareP(=, pieza(T1,_),pieza(T2,_)):- T1=T2.
 
-%% dameMax(P,K,L):- tamanios(P,TS), sort(TS,TSORD), reverse(TSORD, REV), dameMaxAux(REV,K,L).
+nextMax([pieza(T,_)|_],K,T):- T =< K.
+nextMax([pieza(T,_)|Xs],K,T1):- T>K, nextMax(Xs,K,T1).
 
-%% dameMaxAux([X|_],K,L):- X=<K, L=X, !. 
-%% dameMaxAux([X|REV],K,L):- X>K, dameMaxAux(REV,K,L).
+:- dynamic calculado/3.
+
+:- dynamic devolver_de_cache/3.
+
+%% construir2(T,P,SOL):- retractall(lookUp(_,_,_)), predsort(compareP, P, PSORT), nextMax(PSORT,T,M),
+%%                     generar2(T,PSORT,M,SOL), cumpleLimite(P,SOL).%, retract(lookUp(TSORT,M,SOL)).
+
+%% generar2(0,_,_,[]).
+
+%% %generar2(T,_,K,SOL):- lookUp(T,K,SOL).
+
+%% generar2(T,P,K,SOL):- T>0, K>0, L is K-1, not(nextMax(P,L,_)), T1 is T-K,
+%%                     generar2(T1,P,K,SOL1), SOL=[K|SOL1], assert(lookUp(T,K,SOL)).
+
+%% generar2(T,P,K,SOL):- T>0, K>0, L is K-1, nextMax(P,L,M),
+%%                     generar2(T,P,M,SOL), assert(lookUp(T,K,SOL)).
+
+%% generar2(T,P,K,SOL):- T>0, K>0, L is K-1, nextMax(P,L,M1), M is T-K, between(0,M,T1), T2 is T-K-T1,
+%%                     generar2(T1,P,M1,SOL1), generar2(T2,P,K,SOL2), append(SOL1,[K|SOL2],SOL), assert(lookUp(T,K,SOL)).
+
+%% compareP(>, pieza(T1,_),pieza(T2,_)):- T2>T1.
+%% compareP(<, pieza(T1,_),pieza(T2,_)):- T2<T1.
+%% compareP(=, pieza(T1,_),pieza(T2,_)):- T1=T2.
+
+%% nextMax([pieza(T,_)|_],K,T):- T =< K.
+%% nextMax([pieza(T,_)|Xs],K,T1):- T>K, nextMax(Xs,K,T1).
+
+%% :- dynamic lookUp/3.
 
 %%%%%%%%%%%%%%%%%%%%%%%% 
 %% Detalle
@@ -321,28 +352,17 @@ construirConPatron(T,P,PATRON,SOL):- construir1(T,P,SOL), tienePatron(PATRON,SOL
 
 % tienePatron(+Lista,?Patron).
 
-tienePatron(PATRON,LISTA) :- tienePatronAux(PATRON,PATRON,LISTA).
-
-% tienePatronAux(?Patron,?Patron,+Lista). 
- 
-tienePatronAux(_,[],[]).
-tienePatronAux([P|PS],[],[L|LS]) :- tienePatronAux([P|PS],[P|PS],[L|LS]).
-tienePatronAux(PATRON,[P|PS],[X|XS]):- tienePatronAux(PATRON,PS,XS), asignarOChequear(P,X).
-
-% asignarOChequear(?P,+X). Unifica X con P si P no esta instanciada. Compara X con P si
-% P esta instanciado.
-
-asignarOChequear(P,X):- var(P), X=P.
-asignarOChequear(P,X):- not(var(P)), X==P. 
+tienePatron(PATRON,PATRON).
+tienePatron(PATRON,LISTA) :- length(PATRON,N), append(L1,L2,LISTA), length(L1,N), length(L2,M), M>=N, tienePatron(PATRON,L1), tienePatron(PATRON,L2).
 
 %%%%%%%%%%%%%%%%%%%%%%%% 
 %% Detalle
 %%%%%%%%%%%%%%%%%%%%%%%%
-%% La idea es consumir el patron y la lista en simultaneo.
-%% Si el elemento actual del patron esta instanciado entonces hay que verificar que sea igual al elemento
-%% actual de la lista. Caso contrario se unifica el elemento del patron con el elemento de la lista.
-%% Si el patron fue totalmente consumido pero la lista no se encuentra vacia entonces volvemos a comenzar
-%% con lo que queda de patron.
+%% La idea es partir la lista en dos y preguntar si cada una de las sublistas tiene patron. Si el patron y
+%% la lista tienen el mismo tamanio entonces, o bien se unifican las variables no instanciadas, o
+%% bien se chequea la coincidencia de los literales.
+%% Para partir las listas nos aseguramos de que ambas sublistas tengas tamanio mayor o igual al patron.
+%% Si no sucede esto, entonces tienePatron es falso.
 %%%%%%%%%%%%%%%%%%%%%%%%
 %% Ejemplo de uso
 %%%%%%%%%%%%%%%%%%%%%%%% 
@@ -361,7 +381,7 @@ asignarOChequear(P,X):- not(var(P)), X==P.
 
 ejemploListaDeNats1(P) :- listaNats( 1, 20, D), nPiezasDeCada( 5, D, P).
 ejemploListaDeNats2(P) :- listaNats( 1, 3, D_1_3), nPiezasDeCada( 2, D_1_3, P_1_3),
-						  listaNats( 4, 6, D_4_6), nPiezasDeCada( 5, D_4_6, P_4_6), append(P_1_3, P_4_6, P).
+                          listaNats( 4, 6, D_4_6), nPiezasDeCada( 5, D_4_6, P_4_6), append(P_1_3, P_4_6, P).
 
 % Resultado:
 % P = [pieza(3, 2), pieza(1, 2), pieza(2, 2)] 
@@ -443,13 +463,13 @@ ejemploTodosConstruir2(N) :- nPiezasDeCada(2,[3,1,2],P), todosConstruir2(5,P,_,N
 % N = 8 ;
 % false.
 
-ejemploTimeConstruir1(T) :- time(todosConstruir1(5,[pieza(3,2),pieza(1,2),pieza(2,2)],_,T)).
+ejemploTimeConstruir1(T) :- time(todosConstruir1(15,[pieza(10,2),pieza(9,2),pieza(8,2),pieza(7,2),pieza(6,2),pieza(5,2),pieza(4,2),pieza(3,2),pieza(2,2),pieza(1,2)],_,T)).
 
 % ?- ejemploTimeConstruir1(T).
 % 582 inferences, 0.000 CPU in 0.000 seconds (98% CPU, 2220891 Lips)
 % T = 8.
 
-ejemploTimeConstruir2(T) :- time(todosConstruir2(5,[pieza(3,2),pieza(1,2),pieza(2,2)],_, T)).
+ejemploTimeConstruir2(T) :- time(todosConstruir2(15,[pieza(10,2),pieza(9,2),pieza(8,2),pieza(7,2),pieza(6,2),pieza(5,2),pieza(4,2),pieza(3,2),pieza(2,2),pieza(1,2)],_,T)).
 
 % ?- ejemploTimeConstruir2(T).
 % 4,673 inferences, 0.001 CPU in 0.001 seconds (100% CPU, 4325238 Lips)
